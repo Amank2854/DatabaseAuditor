@@ -137,18 +137,18 @@ create table if not exists store (
     last_update timestamp without time zone default now() not null
 );
 
-\copy actor (actor_id, first_name, last_name, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/actor.dat';
-\copy address (address_id, address, address2, district, city_id, postal_code, phone, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/address.dat';
-\copy category (category_id, name, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/category.dat';
-\copy city (city_id, city, country_id, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/city.dat';
-\copy country (country_id, country, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/country.dat';
-\copy customer (customer_id, store_id, first_name, last_name, email, address_id, activebool, create_date, last_update, active) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/customer.dat';
-\copy film (film_id, title, description, release_year, language_id, rental_duration, rental_rate, length, replacement_cost, rating, last_update, special_features, fulltext) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/film.dat';
-\copy film_actor (actor_id, film_id, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/film_actor.dat';
-\copy film_category (film_id, category_id, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/film_category.dat';
-\copy inventory (inventory_id, film_id, store_id, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/inventory.dat';
-\copy language (language_id, name, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/language.dat';
-\copy payment (payment_id, customer_id, staff_id, rental_id, amount, payment_date) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/payment.dat';
-\copy rental (rental_id, rental_date, inventory_id, customer_id, return_date, staff_id, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/rental.dat';
-\copy staff (staff_id, first_name, last_name, address_id, email, store_id, active, username, password, last_update, picture) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/staff.dat';
-\copy store (store_id, manager_staff_id, address_id, last_update) from '/home/phyo/abaw5/DatabaseAuditor/postgresql/data/store.dat';
+\copy actor (actor_id, first_name, last_name, last_update) from 'app/src/postgresql/data/actor.dat';
+\copy address (address_id, address, address2, district, city_id, postal_code, phone, last_update) from 'app/src/postgresql/data/address.dat';
+\copy category (category_id, name, last_update) from 'app/src/postgresql/data/category.dat';
+\copy city (city_id, city, country_id, last_update) from 'app/src/postgresql/data/city.dat';
+\copy country (country_id, country, last_update) from 'app/src/postgresql/data/country.dat';
+\copy customer (customer_id, store_id, first_name, last_name, email, address_id, activebool, create_date, last_update, active) from 'app/src/postgresql/data/customer.dat';
+\copy film (film_id, title, description, release_year, language_id, rental_duration, rental_rate, length, replacement_cost, rating, last_update, special_features, fulltext) from 'app/src/postgresql/data/film.dat';
+\copy film_actor (actor_id, film_id, last_update) from 'app/src/postgresql/data/film_actor.dat';
+\copy film_category (film_id, category_id, last_update) from 'app/src/postgresql/data/film_category.dat';
+\copy inventory (inventory_id, film_id, store_id, last_update) from 'app/src/postgresql/data/inventory.dat';
+\copy language (language_id, name, last_update) from 'app/src/postgresql/data/language.dat';
+\copy payment (payment_id, customer_id, staff_id, rental_id, amount, payment_date) from 'app/src/postgresql/data/payment.dat';
+\copy rental (rental_id, rental_date, inventory_id, customer_id, return_date, staff_id, last_update) from 'app/src/postgresql/data/rental.dat';
+\copy staff (staff_id, first_name, last_name, address_id, email, store_id, active, username, password, last_update, picture) from 'app/src/postgresql/data/staff.dat';
+\copy store (store_id, manager_staff_id, address_id, last_update) from 'app/src/postgresql/data/store.dat';
