@@ -9,10 +9,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 class PostgreSQL implements Database {
-    static final String jdbcUrl = "jdbc:postgresql://localhost/dvdrental";
-    static final String username = "ojassvi";
-    static final String password = "ojassvi";
+    Dotenv dotenv = Dotenv.load();
+    final String jdbcUrl = dotenv.get("POSTGRES_URL");
+    final String username = dotenv.get("POSTGRES_USER");
+    final String password = dotenv.get("POSTGRES_PASSWORD");
     Connection connectionObj = null;
     Utilities util = new Utilities();
 
