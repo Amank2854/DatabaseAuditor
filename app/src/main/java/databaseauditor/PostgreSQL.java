@@ -6,6 +6,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 class PostgreSQL implements Database {
     static final String jdbcUrl = "jdbc:postgresql://localhost/dvdrental";
@@ -14,6 +16,7 @@ class PostgreSQL implements Database {
     Connection connectionObj = null;
     Utilities util = new Utilities();
 
+    @Override
     public boolean connect() {
         if (connectionObj != null) {
             return true;
@@ -28,26 +31,32 @@ class PostgreSQL implements Database {
         }
     }
 
-    public <T> boolean insert(T obj) {
+    @Override
+    public void disconnect() {
+        if (connectionObj != null) {
+            try {
+                connectionObj.close();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public <T> int insertOne(T obj) {
         Field[] fields = obj.getClass().getDeclaredFields();
-        String columns = "(";
-        String values = "(";
+        String columns = "(", values = "(";
 
         for (Field field : fields) {
             try {
                 columns = columns + field.getName().toString() + ", ";
-                if (field.getType().getName().equals("java.lang.String")
-                        || field.getType().getName().equals("java.sql.Timestamp")) {
-                    values = values + "'" + field.get(obj).toString() + "', ";
-                } else {
-                    values = values + field.get(obj).toString() + ", ";
-                }
-            } catch (IllegalArgumentException e1) {
-                System.out.println("Error: " + e1.getMessage());
-                return false;
-            } catch (IllegalAccessException e1) {
-                System.out.println("Error: " + e1.getMessage());
-                return false;
+                values = values + "'" + field.get(obj).toString() + "', ";
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+                return -1;
+            } catch (IllegalAccessException e) {
+                System.out.println("Error: " + e.getMessage());
+                return -1;
             }
         }
 
@@ -61,26 +70,96 @@ class PostgreSQL implements Database {
             PreparedStatement stmt = connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             stmt.execute();
+            return 1;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            return false;
+            return -1;
+        }
+    }
+
+    @Override
+    public <T> int updateMany(T obj, List<List<String>> params) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        List<String> fieldNames = new ArrayList<String>();
+        String updates = "", conditions = "";
+
+        for (Field field : fields) {
+            try {
+                fieldNames.add(field.getName().toString());
+                updates = updates + field.getName().toString() + " = ";
+                updates = updates + "'" + field.get(obj).toString() + "', ";
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+                return -1;
+            } catch (IllegalAccessException e) {
+                System.out.println("Error: " + e.getMessage());
+                return -1;
+            }
         }
 
-        return true;
+        for (List<String> param : params) {
+            if (fieldNames.contains(param.get(0))) {
+                conditions = conditions + " " + param.get(0) + " = ";
+                conditions = conditions + "'" + param.get(1) + "' and";
+            } else {
+                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                return -1;
+            }
+        }
+
+        updates = updates.substring(0, updates.length() - 2);
+        conditions = conditions.substring(0, conditions.length() - 4);
+        String sql = "update " + util.camelToSnakeCase(
+                obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " set "
+                + updates + " where" + conditions + ";";
+
+        try {
+            PreparedStatement stmt = connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
+            return stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return -1;
+        }
     }
 
-    public <T> boolean update(T obj) {
+    @Override
+    public <T> int deleteMany(T obj, List<List<String>> params) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        List<String> fieldNames = new ArrayList<String>();
+        String conditions = "";
 
-        return true;
-    }
+        for (Field field : fields) {
+            try {
+                fieldNames.add(field.getName().toString());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+                return -1;
+            }
+        }
 
-    public <T> boolean delete(T obj) {
+        for (List<String> param : params) {
+            if (fieldNames.contains(param.get(0))) {
+                conditions = conditions + " " + param.get(0) + " = ";
+                conditions = conditions + "'" + param.get(1) + "' and";
+            } else {
+                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                return -1;
+            }
+        }
 
-        return true;
-    }
+        conditions = conditions.substring(0, conditions.length() - 4);
+        String sql = "delete from " + util.camelToSnakeCase(
+                obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " where"
+                + conditions + ";";
 
-    public <T> boolean select(T obj) {
-
-        return true;
+        try {
+            PreparedStatement stmt = connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
+            return stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return -1;
+        }
     }
 }

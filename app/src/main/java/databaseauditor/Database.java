@@ -1,9 +1,15 @@
 package databaseauditor;
 
+import java.util.List;
+
 interface Database {
-    boolean connect();
-    public <T> boolean insert(T obj);
-    public <T> boolean update(T obj);
-    public <T> boolean delete(T obj);
-    public <T> boolean select(T obj);
+    public boolean connect();
+
+    public void disconnect();
+
+    public <T> int insertOne(T obj);
+
+    public <T> int updateMany(T obj, List<List<String>> params);
+
+    public <T> int deleteMany(T obj, List<List<String>> params);
 }
