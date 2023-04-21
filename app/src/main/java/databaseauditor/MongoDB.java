@@ -119,6 +119,7 @@ class MongoDB implements Database {
         }
     }
 
+    @Override
     public <T> int deleteMany(T obj,List<List<String>> params) {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
@@ -152,12 +153,6 @@ class MongoDB implements Database {
             return -1;
         }
     }
-
-    // @Override
-    // public <T> int deleteMany(T obj, List<List<String>> params) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'deleteMany'");
-    // }
 
     @Override
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols) {
