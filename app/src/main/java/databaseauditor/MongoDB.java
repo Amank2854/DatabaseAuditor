@@ -1,46 +1,30 @@
 package databaseauditor;
 
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
+import io.github.cdimascio.dotenv.Dotenv;
+
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+
+import java.text.DateFormat.Field;
 import java.util.List;
 
 import org.bson.Document;
 
 class MongoDB implements Database {
-    final int dbPort = 27017;
-    final String dbUrl = "localhost";
-    final String dbName = "dvdrental";
-    final String username = "ojassvi";
-    final String password = "ojassvi";
+    Dotenv dotenv = Dotenv.load();
+    final String mongoUri = this.dotenv.get("MONGODB_URI");
     MongoDatabase database = null;
     Utilities util = new Utilities();
 
     public boolean connect() {
-        // if (dbClient != null) {
-        // return true;
-        // }
-
-        // try {
-        // dbClient = new MongoClient(dbUrl, dbPort);
-        // db = dbClient.getDatabase(dbName);
-        // return true;
-        // } catch (Exception e) {
-        // System.out.println(e.getMessage());
-        // return false;
-        // } 
-
         if (this.database != null) {
             return true;
         }
 
         try {
-            MongoClient mongo = new MongoClient("localhost", 27017);
-            MongoCredential credential = MongoCredential.createCredential(this.username, this.dbName,
-                    this.password.toCharArray());
+            MongoClient mongo = new MongoClient(new MongoClientURI(mongoUri));
             MongoDatabase database = mongo.getDatabase(this.dbName);
             return true;
         } catch (Exception e) {
@@ -54,30 +38,30 @@ class MongoDB implements Database {
     }
 
     public <T> int insertOne(T obj) {
-        // MongoCollection<Document> collection =
-        // this.db.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
-        // - 1]));
-        // Document document = new Document();
-        // Field[] fields = obj.getClass().getDeclaredFields();
-        // for (Field field : fields) {
-        // try {
-        // document.append(field.getName(), field.get(obj));
-        // } catch (IllegalArgumentException var11) {
-        // System.out.println("Error: " + var11.getMessage());
-        // return false;
-        // } catch (IllegalAccessException var12) {
-        // System.out.println("Error: " + var12.getMessage());
-        // return false;
-        // }
-        // }
+        MongoCollection<Document> collection =
+        this.db.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
+        - 1]));
+        Document document = new Document();
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (Field field : fields) {
+        try {
+        document.append(field.getName(), field.get(obj));
+        } catch (IllegalArgumentException var11) {
+        System.out.println("Error: " + var11.getMessage());
+        return false;
+        } catch (IllegalAccessException var12) {
+        System.out.println("Error: " + var12.getMessage());
+        return false;
+        }
+        }
 
-        // try {
-        // collection.insertOne(document);
-        // return true;
-        // } catch (Exception var10) {
-        // System.out.println(var10.getMessage());
-        // return false;
-        // }
+        try {
+        collection.insertOne(document);
+        return true;
+        } catch (Exception var10) {
+        System.out.println(var10.getMessage());
+        return false;
+        }
         return 1;
     }
 

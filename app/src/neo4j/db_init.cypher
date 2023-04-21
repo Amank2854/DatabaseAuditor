@@ -1,8 +1,22 @@
 MATCH (n)
 DETACH DELETE n;
 
+DROP CONSTRAINT actor_id IF EXISTS;
+DROP CONSTRAINT address_id IF EXISTS;
+DROP CONSTRAINT category_id IF EXISTS;
+DROP CONSTRAINT city_id IF EXISTS;
+DROP CONSTRAINT country_id IF EXISTS;
+DROP CONSTRAINT customer_id IF EXISTS;
+DROP CONSTRAINT film_id IF EXISTS;
+DROP CONSTRAINT inventory_id IF EXISTS;
+DROP CONSTRAINT language_id IF EXISTS;
+DROP CONSTRAINT payment_id IF EXISTS;
+DROP CONSTRAINT rental_id IF EXISTS;
+DROP CONSTRAINT staff_id IF EXISTS;
+DROP CONSTRAINT store_id IF EXISTS;
+
 LOAD CSV WITH HEADERS FROM 'file:///payment.csv' AS row
-MERGE (payment:payment {payment_id: row.payment_id})
+MERGE (payment:Payment {payment_id: row.payment_id})
   ON CREATE SET	payment.customer_id = row.customer_id,
 			payment.staff_id = row.staff_id,
 			payment.rental_id = row.rental_id,
@@ -10,13 +24,13 @@ MERGE (payment:payment {payment_id: row.payment_id})
 			payment.payment_date = row.payment_date;
 
 LOAD CSV WITH HEADERS FROM 'file:///inventory.csv' AS row
-MERGE (inventory:inventory {inventory_id: row.inventory_id})
+MERGE (inventory:Inventory {inventory_id: row.inventory_id})
   ON CREATE SET	inventory.film_id = row.film_id,
 			inventory.store_id = row.store_id,
 			inventory.last_update = row.last_update;
 
 LOAD CSV WITH HEADERS FROM 'file:///film.csv' AS row
-MERGE (film:film {film_id: row.film_id})
+MERGE (film:Film {film_id: row.film_id})
   ON CREATE SET	film.title = row.title,
 			film.description = row.description,
 			film.release_year = row.release_year,
@@ -31,19 +45,19 @@ MERGE (film:film {film_id: row.film_id})
 			film.fulltext = row.fulltext;
 
 LOAD CSV WITH HEADERS FROM 'file:///city.csv' AS row
-MERGE (city:city {city_id: row.city_id})
+MERGE (city:City {city_id: row.city_id})
   ON CREATE SET	city.city = row.city,
 			city.country_id = row.country_id,
 			city.last_update = row.last_update;
 
 LOAD CSV WITH HEADERS FROM 'file:///category.csv' AS row
-MERGE (category:category {category_id: row.category_id})
+MERGE (category: Category {category_id: row.category_id})
   ON CREATE SET	category.name = row.name,
 			category.last_update = row.last_update;
 
 
 LOAD CSV WITH HEADERS FROM 'file:///actor.csv' AS row
-MERGE (actor:actor {actor_id: row.actor_id})
+MERGE (actor:Actor {actor_id: row.actor_id})
   ON CREATE SET	actor.first_name = row.first_name,
 			actor.last_name = row.last_name,
 			actor.last_update = row.last_update;
@@ -80,16 +94,6 @@ LOAD CSV WITH HEADERS FROM 'file:///language.csv' AS row
 MERGE (language:Language {language_id: row.language_id})
   ON CREATE SET language.name = row.name,
 			language.last_update = row.last_update;
-
-LOAD CSV WITH HEADERS FROM 'file:///film_actor.csv' AS row
-MERGE (film_actor:FilmActor {actor_id: row.actor_id})
-  ON CREATE SET film_actor.film_id = row.film_id,
-			film_actor.last_update = row.last_update;
-
-LOAD CSV WITH HEADERS FROM 'file:///film_category.csv' AS row
-MERGE (film_category:FilmCategory {film_id: row.film_id})
-  ON CREATE SET film_category.category_id = row.category_id,
-			film_category.last_update = row.last_update;
 
 LOAD CSV WITH HEADERS FROM 'file:///country.csv' AS row
 MERGE (country:Country {country_id: row.country_id})
