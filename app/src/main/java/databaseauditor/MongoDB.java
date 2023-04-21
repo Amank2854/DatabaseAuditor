@@ -140,4 +140,10 @@ class MongoDB implements Database {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteMany'");
     }
+
+    @Override
+    public <T> int select(T obj, List<List<String>> params, List<String> reqCols) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'select'");
+    }
 }

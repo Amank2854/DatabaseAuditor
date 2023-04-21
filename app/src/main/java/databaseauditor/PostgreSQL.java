@@ -165,4 +165,62 @@ public class PostgreSQL implements Database {
             return -1;
         }
     }
+
+    @Override
+    public <T> int select(T obj, List<List<String>> params, List<String> reqCols) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        List<String> fieldNames = new ArrayList<String>();
+        String columns = "", conditions = "";
+
+        for (Field field : fields) {
+            try {
+                fieldNames.add(field.getName().toString());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+                return -1;
+            }
+        }
+
+        for (List<String> param : params) {
+            if (fieldNames.contains(param.get(0))) {
+                conditions = conditions + " " + param.get(0) + " = ";
+                conditions = conditions + "'" + param.get(1) + "' and";
+            } else {
+                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                return -1;
+            }
+        }
+
+        for (String reqCol : reqCols) {
+            if (fieldNames.contains(reqCol)) {
+                columns = columns + reqCol + ", ";
+            } else {
+                System.out.println("ERROR: Invalid paramater: " + reqCol);
+                return -1;
+            }
+        }
+
+        columns = columns.substring(0, columns.length() - 2);
+        conditions = conditions.substring(0, conditions.length() - 4);
+        String sql = "select " + columns + " from " + this.util.camelToSnakeCase(
+                obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " where"
+                + conditions + ";";
+
+        try {
+            PreparedStatement stmt = this.connectionObj.prepareCall(sql,
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
+            ResultSet result = stmt.executeQuery();
+
+            int count = 0;
+            if (result.last()) {
+                count = result.getRow();
+                result.beforeFirst();
+            }
+            return count;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return -1;
+        }
+    }
 }

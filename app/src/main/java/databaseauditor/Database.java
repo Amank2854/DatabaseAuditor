@@ -12,4 +12,6 @@ interface Database {
     public <T> int updateMany(T obj, List<List<String>> params);
 
     public <T> int deleteMany(T obj, List<List<String>> params);
+
+    public <T> int select(T obj, List<List<String>> params, List<String> reqCols);
 }
