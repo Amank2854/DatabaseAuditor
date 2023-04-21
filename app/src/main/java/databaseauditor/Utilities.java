@@ -23,10 +23,47 @@ public class Utilities {
                         if (result == -1) {
                             System.out.println("ERROR: " + methodName + " failed");
                         } else {
-                            System.out.println("INFO: " + methodName + " for " + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " succeeded in " + (endTime - startTime) + "ns" + " with " + result + " row(s) affected");
+                            System.out.println("INFO: " + methodName + " for "
+                                    + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
+                                            - 1]
+                                    + " succeeded in " + (endTime - startTime) + "ns" + " with " + result
+                                    + " row(s) affected");
                         }
                     }
                     return endTime - startTime;
+                }
+            }
+            return -1;
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+            return -1;
+        }
+    }
+
+    public <T> long getConsumedMemory(T obj, String methodName, Object[] params, boolean log) {
+        try {
+            Class<?> clazz = obj.getClass();
+            Method methlist[] = clazz.getDeclaredMethods();
+            for (int i = 0; i < methlist.length; i++) {
+                if (methlist[i].getName().equals(methodName)) {
+                    Class<?> pvec[] = methlist[i].getParameterTypes();
+                    Method method = clazz.getMethod(methodName, pvec);
+                    long startMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                    int result = (Integer) method.invoke(obj, params);
+                    long endMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+                    if (log) {
+                        if (result == -1) {
+                            System.out.println("ERROR: " + methodName + " failed");
+                        } else {
+                            System.out.println("INFO: " + methodName + " for "
+                                    + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
+                                            - 1]
+                                    + " succeeded in " + (endMemory - startMemory) + " bytes" + " with " + result
+                                    + " row(s) affected");
+                        }
+                    }
+                    return endMemory - startMemory;
                 }
             }
             return -1;

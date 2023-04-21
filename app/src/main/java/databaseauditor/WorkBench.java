@@ -53,11 +53,11 @@ public class WorkBench {
         Utilities utils = new Utilities();
         Object[] params = new Object[1];
         params[0] = obj;
-        utils.getElapsedTime(postgres, "insertOne", params, true);
+        utils.getConsumedMemory(postgres, "insertOne", params, true);
         params = new Object[2];
         params[0] = obj;
         params[1] = prms;
-        utils.getElapsedTime(postgres, "updateMany", params, true);
-        utils.getElapsedTime(postgres, "deleteMany", params, true);
+        utils.getConsumedMemory(postgres, "updateMany", params, true);
+        utils.getConsumedMemory(postgres, "deleteMany", params, true);
     }
 }
