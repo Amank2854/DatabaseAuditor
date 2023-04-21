@@ -46,7 +46,7 @@ class MongoDB implements Database {
 
     @Override
     public void disconnect() {
-
+        this.database = null;
     }
 
     @Override
