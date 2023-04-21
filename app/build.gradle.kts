@@ -11,6 +11,10 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
     implementation("org.postgresql:postgresql:42.5.3")
     implementation("io.github.cdimascio:dotenv-java:2.3.2")
+    implementation("org.mongodb:mongodb-driver-core:4.2.3")
+    implementation("org.mongodb:mongo-java-driver:3.12.10")
+    implementation("org.mongodb:bson:4.2.3")
+
 }
 
 application {

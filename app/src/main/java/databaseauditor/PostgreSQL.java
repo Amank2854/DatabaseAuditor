@@ -11,22 +11,22 @@ import java.util.List;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-class PostgreSQL implements Database {
+public class PostgreSQL implements Database {
     Dotenv dotenv = Dotenv.load();
-    final String jdbcUrl = dotenv.get("POSTGRES_URL");
-    final String username = dotenv.get("POSTGRES_USER");
-    final String password = dotenv.get("POSTGRES_PASSWORD");
+    final String jdbcUrl = this.dotenv.get("POSTGRES_URL");
+    final String username = this.dotenv.get("POSTGRES_USER");
+    final String password = this.dotenv.get("POSTGRES_PASSWORD");
     Connection connectionObj = null;
     Utilities util = new Utilities();
 
     @Override
     public boolean connect() {
-        if (connectionObj != null) {
+        if (this.connectionObj != null) {
             return true;
         }
 
         try {
-            connectionObj = DriverManager.getConnection(jdbcUrl, username, password);
+            this.connectionObj = DriverManager.getConnection(this.jdbcUrl, this.username, this.password);
             return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -36,9 +36,9 @@ class PostgreSQL implements Database {
 
     @Override
     public void disconnect() {
-        if (connectionObj != null) {
+        if (this.connectionObj != null) {
             try {
-                connectionObj.close();
+                this.connectionObj.close();
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
@@ -65,12 +65,12 @@ class PostgreSQL implements Database {
 
         columns = columns.substring(0, columns.length() - 2) + ")";
         values = values.substring(0, values.length() - 2) + ")";
-        String sql = "insert into " + util.camelToSnakeCase(
+        String sql = "insert into " + this.util.camelToSnakeCase(
                 obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " "
                 + columns + " values " + values + ";";
 
         try {
-            PreparedStatement stmt = connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             stmt.execute();
             return 1;
@@ -112,12 +112,12 @@ class PostgreSQL implements Database {
 
         updates = updates.substring(0, updates.length() - 2);
         conditions = conditions.substring(0, conditions.length() - 4);
-        String sql = "update " + util.camelToSnakeCase(
+        String sql = "update " + this.util.camelToSnakeCase(
                 obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " set "
                 + updates + " where" + conditions + ";";
 
         try {
-            PreparedStatement stmt = connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             return stmt.executeUpdate();
         } catch (SQLException e) {
@@ -152,12 +152,12 @@ class PostgreSQL implements Database {
         }
 
         conditions = conditions.substring(0, conditions.length() - 4);
-        String sql = "delete from " + util.camelToSnakeCase(
+        String sql = "delete from " + this.util.camelToSnakeCase(
                 obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " where"
                 + conditions + ";";
 
         try {
-            PreparedStatement stmt = connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             return stmt.executeUpdate();
         } catch (SQLException e) {
