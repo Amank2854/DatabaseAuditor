@@ -1,59 +1,62 @@
 package databaseauditor;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+import com.mongodb.client.model.Updates;
+import io.github.cdimascio.dotenv.Dotenv;
+
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.cdimascio.dotenv.Dotenv;
+import com.mongodb.client.result.UpdateResult;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
-public class PostgreSQL implements Database {
+import static com.mongodb.client.model.Filters.*;
+
+class MongoDB implements Database {
     Dotenv dotenv = Dotenv.load();
-    final String jdbcUrl = this.dotenv.get("POSTGRES_URL");
-    final String username = this.dotenv.get("POSTGRES_USER");
-    final String password = this.dotenv.get("POSTGRES_PASSWORD");
-    Connection connectionObj = null;
+    final String mongoUri = this.dotenv.get("MONGODB_URI");
+    final String dbName = this.dotenv.get("MONGODB_DBNAME");
+    MongoDatabase database = null;
     Utilities util = new Utilities();
 
     @Override
     public boolean connect() {
-        if (this.connectionObj != null) {
+        if (this.database != null) {
             return true;
         }
 
         try {
-            this.connectionObj = DriverManager.getConnection(this.jdbcUrl, this.username, this.password);
+            MongoClient mongo = new MongoClient(new MongoClientURI(mongoUri));
+            this.database = mongo.getDatabase(this.dbName);
             return true;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
             return false;
         }
     }
 
     @Override
     public void disconnect() {
-        if (this.connectionObj != null) {
-            try {
-                this.connectionObj.close();
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
-        }
+
     }
 
     @Override
     public <T> int insertOne(T obj) {
+        MongoCollection<Document> collection = this.database.getCollection(
+                util.camelToSnakeCase(
+                        obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]));
+        Document document = new Document();
         Field[] fields = obj.getClass().getDeclaredFields();
-        String columns = "(", values = "(";
-
         for (Field field : fields) {
             try {
-                columns = columns + field.getName().toString() + ", ";
-                values = values + "'" + field.get(obj).toString() + "', ";
+                document.append(field.getName().toString(), field.get(obj).toString());
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());
                 return -1;
@@ -63,164 +66,95 @@ public class PostgreSQL implements Database {
             }
         }
 
-        columns = columns.substring(0, columns.length() - 2) + ")";
-        values = values.substring(0, values.length() - 2) + ")";
-        String sql = "insert into " + this.util.camelToSnakeCase(
-                obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " "
-                + columns + " values " + values + ";";
-
         try {
-            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            stmt.execute();
+            collection.insertOne(document);
             return 1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
             return -1;
         }
     }
 
     @Override
     public <T> int updateMany(T obj, List<List<String>> params) {
+        MongoCollection<Document> collection = this.database.getCollection(
+                util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
+                        - 1]));
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
-        String updates = "", conditions = "";
-
+        List<Bson> updates = new ArrayList<>();
         for (Field field : fields) {
             try {
                 fieldNames.add(field.getName().toString());
-                updates = updates + field.getName().toString() + " = ";
-                updates = updates + "'" + field.get(obj).toString() + "', ";
-            } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
-                return -1;
+                updates.add(Updates.set(field.getName().toString(), field.get(obj).toString()));
             } catch (IllegalAccessException e) {
                 System.out.println("Error: " + e.getMessage());
                 return -1;
             }
         }
 
+        Bson filter = null;
         for (List<String> param : params) {
             if (fieldNames.contains(param.get(0))) {
-                conditions = conditions + " " + param.get(0) + " = ";
-                conditions = conditions + "'" + param.get(1) + "' and";
+                if (filter == null) {
+                    filter = eq(param.get(0).toString(), param.get(1).toString());
+                } else {
+                    filter = and(filter, eq(param.get(0).toString(), param.get(1).toString()));
+                }
+
             } else {
                 System.out.println("ERROR: Invalid paramater: " + param.get(0));
                 return -1;
             }
         }
 
-        updates = updates.substring(0, updates.length() - 2);
-        conditions = conditions.substring(0, conditions.length() - 4);
-        String sql = "update " + this.util.camelToSnakeCase(
-                obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " set "
-                + updates + " where" + conditions + ";";
-
         try {
-            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            return stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            UpdateResult result = collection.updateMany(filter, Updates.combine(updates));
+            return (int) result.getModifiedCount();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
             return -1;
         }
+    }
+
+    public <T> int deleteMany(T obj) {
+        // MongoCollection<Document> collection =
+        // this.database.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\.")[obj.getClass().getName().split("\.").length
+        // - 1]));
+        // Document document = new Document();
+        // Field[] fields = obj.getClass().getDeclaredFields();
+        // for (Field field : fields) {
+        // try {
+        // if (field.getName().equalsIgnoreCase("id")) {
+        // document.append(field.getName(), field.get(obj));
+        // }
+        // } catch (IllegalArgumentException var11) {
+        // System.out.println("Error: " + var11.getMessage());
+        // return false;
+        // } catch (IllegalAccessException var12) {
+        // System.out.println("Error: " + var12.getMessage());
+        // return false;
+        // }
+        // }
+        // try {
+        // collection.deleteOne(document);
+        // return true;
+        // } catch (Exception var10) {
+        // System.out.println(var10.getMessage());
+        // return false;
+        // }
+        return 1;
     }
 
     @Override
     public <T> int deleteMany(T obj, List<List<String>> params) {
-        Field[] fields = obj.getClass().getDeclaredFields();
-        List<String> fieldNames = new ArrayList<String>();
-        String conditions = "";
-
-        for (Field field : fields) {
-            try {
-                fieldNames.add(field.getName().toString());
-            } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
-                return -1;
-            }
-        }
-
-        for (List<String> param : params) {
-            if (fieldNames.contains(param.get(0))) {
-                conditions = conditions + " " + param.get(0) + " = ";
-                conditions = conditions + "'" + param.get(1) + "' and";
-            } else {
-                System.out.println("ERROR: Invalid paramater: " + param.get(0));
-                return -1;
-            }
-        }
-
-        conditions = conditions.substring(0, conditions.length() - 4);
-        String sql = "delete from " + this.util.camelToSnakeCase(
-                obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " where"
-                + conditions + ";";
-
-        try {
-            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            return stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteMany'");
     }
 
     @Override
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols) {
-        Field[] fields = obj.getClass().getDeclaredFields();
-        List<String> fieldNames = new ArrayList<String>();
-        String columns = "", conditions = "";
-
-        for (Field field : fields) {
-            try {
-                fieldNames.add(field.getName().toString());
-            } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
-                return -1;
-            }
-        }
-
-        for (List<String> param : params) {
-            if (fieldNames.contains(param.get(0))) {
-                conditions = conditions + " " + param.get(0) + " = ";
-                conditions = conditions + "'" + param.get(1) + "' and";
-            } else {
-                System.out.println("ERROR: Invalid paramater: " + param.get(0));
-                return -1;
-            }
-        }
-
-        for (String reqCol : reqCols) {
-            if (fieldNames.contains(reqCol)) {
-                columns = columns + reqCol + ", ";
-            } else {
-                System.out.println("ERROR: Invalid paramater: " + reqCol);
-                return -1;
-            }
-        }
-
-        columns = columns.substring(0, columns.length() - 2);
-        conditions = conditions.substring(0, conditions.length() - 4);
-        String sql = "select " + columns + " from " + this.util.camelToSnakeCase(
-                obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " where"
-                + conditions + ";";
-
-        try {
-            PreparedStatement stmt = this.connectionObj.prepareCall(sql,
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            ResultSet result = stmt.executeQuery();
-
-            int count = 0;
-            if (result.last()) {
-                count = result.getRow();
-                result.beforeFirst();
-            }
-            return count;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'select'");
     }
 }
