@@ -1,5 +1,6 @@
 package databaseauditor;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -7,7 +8,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
-import java.text.DateFormat.Field;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import org.bson.Document;
@@ -15,9 +16,11 @@ import org.bson.Document;
 class MongoDB implements Database {
     Dotenv dotenv = Dotenv.load();
     final String mongoUri = this.dotenv.get("MONGODB_URI");
+    final String dbName = this.dotenv.get("MONGODB_DBNAME");
     MongoDatabase database = null;
     Utilities util = new Utilities();
-
+    
+    @Override    
     public boolean connect() {
         if (this.database != null) {
             return true;
@@ -25,49 +28,49 @@ class MongoDB implements Database {
 
         try {
             MongoClient mongo = new MongoClient(new MongoClientURI(mongoUri));
-            MongoDatabase database = mongo.getDatabase(this.dbName);
+            this.database = mongo.getDatabase(this.dbName);
             return true;
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
             return false;
         }
     }
-
+    
+    @Override
     public void disconnect() {
 
     }
-
+    
+    @Override
     public <T> int insertOne(T obj) {
-        MongoCollection<Document> collection =
-        this.db.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
-        - 1]));
+        MongoCollection<Document> collection = this.database.getCollection(
+                util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]));
         Document document = new Document();
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
-        try {
-        document.append(field.getName(), field.get(obj));
-        } catch (IllegalArgumentException var11) {
-        System.out.println("Error: " + var11.getMessage());
-        return false;
-        } catch (IllegalAccessException var12) {
-        System.out.println("Error: " + var12.getMessage());
-        return false;
-        }
+            try {
+                document.append(field.getName().toString(), field.get(obj).toString());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+                return -1;
+            } catch (IllegalAccessException e) {
+                System.out.println("Error: " + e.getMessage());
+                return -1;
+            }
         }
 
         try {
-        collection.insertOne(document);
-        return true;
-        } catch (Exception var10) {
-        System.out.println(var10.getMessage());
-        return false;
+            collection.insertOne(document);
+            return 1;
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return -1;
         }
-        return 1;
     }
 
     public <T> int updateMany(T obj) {
         // MongoCollection<Document> collection =
-        // this.db.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
+        // this.database.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
         // - 1]));
         // Document document = new Document();
         // Field[] fields = obj.getClass().getDeclaredFields();
@@ -99,7 +102,7 @@ class MongoDB implements Database {
 
     public <T> int deleteMany(T obj) {
         // MongoCollection<Document> collection =
-        // this.db.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\.")[obj.getClass().getName().split("\.").length
+        // this.database.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\.")[obj.getClass().getName().split("\.").length
         // - 1]));
         // Document document = new Document();
         // Field[] fields = obj.getClass().getDeclaredFields();
