@@ -10,9 +10,11 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -117,44 +119,88 @@ class MongoDB implements Database {
         }
     }
 
-    public <T> int deleteMany(T obj) {
-        // MongoCollection<Document> collection =
-        // this.database.getCollection(util.camelToSnakeCase(obj.getClass().getName().split("\.")[obj.getClass().getName().split("\.").length
-        // - 1]));
-        // Document document = new Document();
-        // Field[] fields = obj.getClass().getDeclaredFields();
-        // for (Field field : fields) {
-        // try {
-        // if (field.getName().equalsIgnoreCase("id")) {
-        // document.append(field.getName(), field.get(obj));
-        // }
-        // } catch (IllegalArgumentException var11) {
-        // System.out.println("Error: " + var11.getMessage());
-        // return false;
-        // } catch (IllegalAccessException var12) {
-        // System.out.println("Error: " + var12.getMessage());
-        // return false;
-        // }
-        // }
-        // try {
-        // collection.deleteOne(document);
-        // return true;
-        // } catch (Exception var10) {
-        // System.out.println(var10.getMessage());
-        // return false;
-        // }
-        return 1;
+    public <T> int deleteMany(T obj,List<List<String>> params) {
+        MongoCollection<Document> collection = this.database.getCollection(
+                util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
+                        - 1]));
+        Field[] fields = obj.getClass().getDeclaredFields();
+        List<String> fieldNames = new ArrayList<String>();
+        for (Field field : fields) {
+            fieldNames.add(field.getName().toString());
+        }
+
+        Bson filter = null;
+        for (List<String> param : params) {
+            if (fieldNames.contains(param.get(0))) {
+                if (filter == null) {
+                    filter = eq(param.get(0).toString(), param.get(1).toString());
+                } else {
+                    filter = and(filter, eq(param.get(0).toString(), param.get(1).toString()));
+                }
+
+            } else {
+                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                return -1;
+            }
+        }
+
+        try {
+            DeleteResult result = collection.deleteMany(filter);
+            return (int) result.getDeletedCount();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return -1;
+        }
     }
 
-    @Override
-    public <T> int deleteMany(T obj, List<List<String>> params) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteMany'");
-    }
+    // @Override
+    // public <T> int deleteMany(T obj, List<List<String>> params) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'deleteMany'");
+    // }
 
     @Override
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'select'");
+        MongoCollection<Document> collection = this.database.getCollection(
+                util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
+                        - 1]));
+        Field[] fields = obj.getClass().getDeclaredFields();
+        List<String> fieldNames = new ArrayList<String>();
+        for (Field field : fields) {
+            fieldNames.add(field.getName().toString());
+        }
+
+        Bson filter = null;
+        for (List<String> param : params) {
+            if (fieldNames.contains(param.get(0))) {
+                if (filter == null) {
+                    filter = eq(param.get(0).toString(), param.get(1).toString());
+                } else {
+                    filter = and(filter, eq(param.get(0).toString(), param.get(1).toString()));
+                }
+
+            } else {
+                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                return -1;
+            }
+        }
+
+        Document projection = new Document();
+        for (String col : reqCols) {
+            if (fieldNames.contains(col)) {
+                projection.append(col, 1);
+            } else {
+                System.out.println("ERROR: Invalid column: " + col);
+                return -1;
+            }
+        }
+
+        try {
+            ArrayList<Document> results = collection.find(filter).projection(projection).into(new ArrayList<Document>());
+            return results.size();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return -1;
+        }
     }
 }

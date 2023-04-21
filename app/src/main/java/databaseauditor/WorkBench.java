@@ -44,9 +44,16 @@ public class WorkBench {
         //     System.out.println("INSERT SUCCESSFULL");
         // }
 
-        obj.city_id = 2;
-        if (mongodb.updateMany(obj, params) != -1) {
+        // obj.city_id = 2;
+        // if (mongodb.updateMany(obj, params) != -1) {
+        //     System.out.println("UPDATE SUCCESSFULL");
+        // }
+        if (mongodb.deleteMany(obj, params) != -1) {
             System.out.println("UPDATE SUCCESSFULL");
         }
+
+        // if(mongodb.select(obj, params, reqCols) != -1) {
+        //     System.out.println("SELECT SUCCESSFULL");
+        // }
     }
 }
