@@ -17,7 +17,7 @@ public class WorkBench {
         // // }
 
         // // obj.city_id = 2;
-        // List<List<String>> params = Arrays.asList(Arrays.asList("address_id", "1"));
+        List<List<String>> prms = Arrays.asList(Arrays.asList("address_id", "1"));
         // // int rows = postgres.updateMany(obj, params);
         // // if (rows != -1) {
         // //     System.out.println("UPDATE SUCCESSFULL " + rows);
@@ -53,6 +53,11 @@ public class WorkBench {
         Utilities utils = new Utilities();
         Object[] params = new Object[1];
         params[0] = obj;
-        System.out.println(utils.getElapsedTime("Address", "insertOne", params));
+        utils.getElapsedTime(postgres, "insertOne", params, true);
+        params = new Object[2];
+        params[0] = obj;
+        params[1] = prms;
+        utils.getElapsedTime(postgres, "updateMany", params, true);
+        utils.getElapsedTime(postgres, "deleteMany", params, true);
     }
 }
