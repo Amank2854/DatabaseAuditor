@@ -1,4 +1,4 @@
-package databaseauditor;
+package databaseauditor.Database;
 
 import java.util.List;
 

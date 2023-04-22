@@ -1,4 +1,4 @@
-package databaseauditor;
+package databaseauditor.Database;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import databaseauditor.Utilities;
 
 public class PostgreSQL implements Database {
     Connection conn = null;

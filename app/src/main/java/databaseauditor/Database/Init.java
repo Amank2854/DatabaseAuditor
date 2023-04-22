@@ -1,4 +1,4 @@
-package databaseauditor;
+package databaseauditor.Database;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -11,6 +11,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 
+import databaseauditor.Utilities;
 import io.github.cdimascio.dotenv.Dotenv;
 
 

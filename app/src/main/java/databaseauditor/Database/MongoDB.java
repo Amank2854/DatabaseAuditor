@@ -1,4 +1,4 @@
-package databaseauditor;
+package databaseauditor.Database;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -15,6 +15,9 @@ import java.util.List;
 
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+
+import databaseauditor.Utilities;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
