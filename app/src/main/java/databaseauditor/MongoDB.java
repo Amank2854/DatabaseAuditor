@@ -20,25 +20,23 @@ import org.bson.conversions.Bson;
 
 import static com.mongodb.client.model.Filters.*;
 
-class MongoDB implements Database {
-    Dotenv dotenv = Dotenv.load();
-    final String mongoUri = this.dotenv.get("MONGODB_URI");
-    final String dbName = this.dotenv.get("MONGODB_DBNAME");
+public class MongoDB implements Database {
     MongoDatabase database = null;
     Utilities util = new Utilities();
 
     @Override
-    public boolean connect() {
+    public boolean connect(String url, String username, String password) {
         if (this.database != null) {
             return true;
         }
 
         try {
-            MongoClient mongo = new MongoClient(new MongoClientURI(mongoUri));
-            this.database = mongo.getDatabase(this.dbName);
+            Dotenv dotenv = Dotenv.load();
+            MongoClient mongo = new MongoClient(new MongoClientURI(url));
+            this.database = mongo.getDatabase(dotenv.get("DB_NAME"));
             return true;
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -59,10 +57,10 @@ class MongoDB implements Database {
             try {
                 document.append(field.getName().toString(), field.get(obj).toString());
             } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             } catch (IllegalAccessException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             }
         }
@@ -71,7 +69,7 @@ class MongoDB implements Database {
             collection.insertOne(document);
             return 1;
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
             return -1;
         }
     }
@@ -89,7 +87,7 @@ class MongoDB implements Database {
                 fieldNames.add(field.getName().toString());
                 updates.add(Updates.set(field.getName().toString(), field.get(obj).toString()));
             } catch (IllegalAccessException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             }
         }
@@ -104,7 +102,7 @@ class MongoDB implements Database {
                 }
 
             } else {
-                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                System.out.println("INVALID PARAMETER: " + param.get(0));
                 return -1;
             }
         }
@@ -113,13 +111,13 @@ class MongoDB implements Database {
             UpdateResult result = collection.updateMany(filter, Updates.combine(updates));
             return (int) result.getModifiedCount();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
             return -1;
         }
     }
 
     @Override
-    public <T> int deleteMany(T obj,List<List<String>> params) {
+    public <T> int deleteMany(T obj, List<List<String>> params) {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
                         - 1]));
@@ -139,7 +137,7 @@ class MongoDB implements Database {
                 }
 
             } else {
-                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                System.out.println("INVALID PARAMETER: " + param.get(0));
                 return -1;
             }
         }
@@ -148,7 +146,7 @@ class MongoDB implements Database {
             DeleteResult result = collection.deleteMany(filter);
             return (int) result.getDeletedCount();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
             return -1;
         }
     }
@@ -174,7 +172,7 @@ class MongoDB implements Database {
                 }
 
             } else {
-                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                System.out.println("INVALID PARAMETER: " + param.get(0));
                 return -1;
             }
         }
@@ -184,16 +182,17 @@ class MongoDB implements Database {
             if (fieldNames.contains(col)) {
                 projection.append(col, 1);
             } else {
-                System.out.println("ERROR: Invalid column: " + col);
+                System.out.println("INVALID FIELD: " + col);
                 return -1;
             }
         }
 
         try {
-            ArrayList<Document> results = collection.find(filter).projection(projection).into(new ArrayList<Document>());
+            ArrayList<Document> results = collection.find(filter).projection(projection)
+                    .into(new ArrayList<Document>());
             return results.size();
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(e.getMessage());
             return -1;
         }
     }

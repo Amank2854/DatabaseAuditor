@@ -9,24 +9,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 public class PostgreSQL implements Database {
-    Dotenv dotenv = Dotenv.load();
-    final String jdbcUrl = this.dotenv.get("POSTGRES_URL");
-    final String username = this.dotenv.get("POSTGRES_USER");
-    final String password = this.dotenv.get("POSTGRES_PASSWORD");
-    Connection connectionObj = null;
+    Connection conn = null;
     Utilities util = new Utilities();
 
     @Override
-    public boolean connect() {
-        if (this.connectionObj != null) {
+    public boolean connect(String url, String username, String password) {
+        if (this.conn != null) {
             return true;
         }
 
         try {
-            this.connectionObj = DriverManager.getConnection(this.jdbcUrl, this.username, this.password);
+            this.conn = DriverManager.getConnection(url, username, password);
             return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -36,9 +30,9 @@ public class PostgreSQL implements Database {
 
     @Override
     public void disconnect() {
-        if (this.connectionObj != null) {
+        if (this.conn != null) {
             try {
-                this.connectionObj.close();
+                this.conn.close();
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
@@ -55,10 +49,10 @@ public class PostgreSQL implements Database {
                 columns = columns + field.getName().toString() + ", ";
                 values = values + "'" + field.get(obj).toString() + "', ";
             } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             } catch (IllegalAccessException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             }
         }
@@ -70,7 +64,7 @@ public class PostgreSQL implements Database {
                 + columns + " values " + values + ";";
 
         try {
-            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+            PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             stmt.execute();
             return 1;
@@ -92,10 +86,10 @@ public class PostgreSQL implements Database {
                 updates = updates + field.getName().toString() + " = ";
                 updates = updates + "'" + field.get(obj).toString() + "', ";
             } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             } catch (IllegalAccessException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             }
         }
@@ -105,7 +99,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                System.out.println("INVALID PARAMETER: " + param.get(0));
                 return -1;
             }
         }
@@ -117,7 +111,7 @@ public class PostgreSQL implements Database {
                 + updates + " where" + conditions + ";";
 
         try {
-            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+            PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             return stmt.executeUpdate();
         } catch (SQLException e) {
@@ -136,7 +130,7 @@ public class PostgreSQL implements Database {
             try {
                 fieldNames.add(field.getName().toString());
             } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             }
         }
@@ -146,7 +140,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                System.out.println("INVALID PARAMETER: " + param.get(0));
                 return -1;
             }
         }
@@ -157,7 +151,7 @@ public class PostgreSQL implements Database {
                 + conditions + ";";
 
         try {
-            PreparedStatement stmt = this.connectionObj.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+            PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             return stmt.executeUpdate();
         } catch (SQLException e) {
@@ -176,7 +170,7 @@ public class PostgreSQL implements Database {
             try {
                 fieldNames.add(field.getName().toString());
             } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
                 return -1;
             }
         }
@@ -186,7 +180,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                System.out.println("ERROR: Invalid paramater: " + param.get(0));
+                System.out.println("INVALID PARAMETER: " + param.get(0));
                 return -1;
             }
         }
@@ -195,7 +189,7 @@ public class PostgreSQL implements Database {
             if (fieldNames.contains(reqCol)) {
                 columns = columns + reqCol + ", ";
             } else {
-                System.out.println("ERROR: Invalid paramater: " + reqCol);
+                System.out.println("INVALID COLUMN: " + reqCol);
                 return -1;
             }
         }
@@ -207,7 +201,7 @@ public class PostgreSQL implements Database {
                 + conditions + ";";
 
         try {
-            PreparedStatement stmt = this.connectionObj.prepareCall(sql,
+            PreparedStatement stmt = this.conn.prepareCall(sql,
                     ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             ResultSet result = stmt.executeQuery();

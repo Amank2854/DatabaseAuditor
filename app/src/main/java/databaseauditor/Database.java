@@ -3,7 +3,7 @@ package databaseauditor;
 import java.util.List;
 
 interface Database {
-    public boolean connect();
+    public boolean connect(String url, String username, String password);
 
     public void disconnect();
 
