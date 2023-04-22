@@ -2,11 +2,11 @@ package databaseauditor.Models;
 
 import java.sql.Timestamp;
 
-class Actor {
-    int actor_id;
-    String first_name;
-    String last_name;
-    Timestamp last_update;
+public class Actor {
+    public int actor_id;
+    public String first_name;
+    public String last_name;
+    public Timestamp last_update;
 
     Actor(int actor_id, String first_name, String last_name, Timestamp last_update) {
         this.actor_id = actor_id;

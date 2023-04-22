@@ -2,15 +2,15 @@ package databaseauditor.Models;
 
 import java.sql.Timestamp;
 
-class Address {
-    int address_id;
-    String address;
-    String address2;
-    String district;
-    int city_id;
-    String postal_code;
-    String phone;
-    Timestamp last_update;
+public class Address {
+    public int address_id;
+    public String address;
+    public String address2;
+    public String district;
+    public int city_id;
+    public String postal_code;
+    public String phone;
+    public Timestamp last_update;
 
     Address(int address_id, String address, String address2, String district, int city_id, String postal_code,
             String phone, Timestamp last_update) {
