@@ -1,21 +1,20 @@
 package databaseauditor.Model;
 
-import java.sql.Timestamp;
 
 public class Customer {
-    public int customer_id;
-    public int store_id;
+    public String customer_id;
+    public String store_id;
     public String first_name;
     public String last_name;
     public String email;
-    public int address_id;
-    public boolean activebool;
-    public Timestamp create_date;
-    public Timestamp last_update;
-    public int active;
+    public String address_id;
+    public String activebool;
+    public String create_date;
+    public String last_update;
+    public String active;
 
-    Customer(int customer_id, int store_id, String first_name, String last_name, String email, int address_id,
-             boolean activebool, Timestamp create_date, Timestamp last_update, int active) {
+    Customer(String customer_id, String store_id, String first_name, String last_name, String email, String address_id,
+             String activebool, String create_date, String last_update, String active) {
         this.customer_id = customer_id;
         this.store_id = store_id;
         this.first_name = first_name;

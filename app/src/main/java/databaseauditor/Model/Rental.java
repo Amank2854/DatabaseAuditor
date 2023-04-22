@@ -1,18 +1,16 @@
 package databaseauditor.Model;
 
-import java.sql.Timestamp;
-
 public class Rental {
-    public int rental_id;
-    public Timestamp rental_date;
-    public int inventory_id;
-    public int customer_id;
-    public Timestamp return_date;
-    public int staff_id;
-    public Timestamp last_update;
+    public String rental_id;
+    public String rental_date;
+    public String inventory_id;
+    public String customer_id;
+    public String return_date;
+    public String staff_id;
+    public String last_update;
 
-    Rental(int rental_id, Timestamp rental_date, int inventory_id, int customer_id, Timestamp return_date, int staff_id,
-           Timestamp last_update) {
+    Rental(String rental_id, String rental_date, String inventory_id, String customer_id, String return_date, String staff_id,
+           String last_update) {
         this.rental_id = rental_id;
         this.rental_date = rental_date;
         this.inventory_id = inventory_id;

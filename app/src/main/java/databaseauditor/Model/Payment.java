@@ -1,16 +1,15 @@
 package databaseauditor.Model;
 
-import java.sql.Timestamp;
 
 public class Payment {
-    public int payment_id;
-    public int customer_id;
-    public int staff_id;
-    public int rental_id;
-    public double amount;
-    public Timestamp payment_date;
+    public String payment_id;
+    public String customer_id;
+    public String staff_id;
+    public String rental_id;
+    public String amount;
+    public String payment_date;
 
-    Payment(int payment_id, int customer_id, int staff_id, int rental_id, double amount, Timestamp payment_date) {
+    Payment(String payment_id, String customer_id, String staff_id, String rental_id, String amount, String payment_date) {
         this.payment_id = payment_id;
         this.customer_id = customer_id;
         this.staff_id = staff_id;

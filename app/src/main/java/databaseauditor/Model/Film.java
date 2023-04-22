@@ -1,24 +1,23 @@
 package databaseauditor.Model;
 
-import java.sql.Timestamp;
 public class Film {
-    public int film_id;
+    public String film_id;
     public String title;
     public String description;
-    public Timestamp release_year;
-    public int language_id;
+    public String release_year;
+    public String language_id;
     public String fulltext;
-    public int rental_duration;
-    public double rental_rate;
-    public int length;
-    public double replacement_cost;
+    public String rental_duration;
+    public String rental_rate;
+    public String length;
+    public String replacement_cost;
     public String rating;
     public String special_features;
-    public Timestamp last_update;
+    public String last_update;
 
-    Film(int film_id, String title, String description, Timestamp release_year, int language_id, String fulltext,
-         int rental_duration, double rental_rate, int length, double replacement_cost, String rating,
-         String special_features, Timestamp last_update) {
+    Film(String film_id, String title, String description, String release_year, String language_id, String fulltext,
+         String rental_duration, String rental_rate, String length, String replacement_cost, String rating,
+         String special_features, String last_update) {
         this.film_id = film_id;
         this.title = title;
         this.description = description;

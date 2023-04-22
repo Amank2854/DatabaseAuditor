@@ -1,7 +1,7 @@
 package databaseauditor;
 
 import databaseauditor.Database.Init;
-import databaseauditor.Models.Instances;
+import databaseauditor.Model.Instances;
 
 public class WorkBench {
     void init() {

@@ -1,22 +1,21 @@
 package databaseauditor.Model;
 
-import java.sql.Timestamp;
 
 public class Staff {
-    public int staff_id;
-    public int address_id;
+    public String staff_id;
+    public String address_id;
     public String first_name;
     public String last_name;
     public String email;
-    public int store_id;
-    public int picture;
+    public String store_id;
+    public String picture;
     public String username;
     public String password;
-    public Timestamp last_update;
-    public int active;
+    public String last_update;
+    public String active;
 
-    Staff(int staff_id, int address_id, String first_name, String last_name, String email, int store_id, int picture,
-          String username, String password, Timestamp last_update, int active) {
+    Staff(String staff_id, String address_id, String first_name, String last_name, String email, String store_id, String picture,
+          String username, String password, String last_update, String active) {
         this.staff_id = staff_id;
         this.address_id = address_id;
         this.first_name = first_name;

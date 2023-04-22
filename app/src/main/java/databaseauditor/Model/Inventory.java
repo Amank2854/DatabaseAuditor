@@ -1,14 +1,13 @@
 package databaseauditor.Model;
 
-import java.sql.Timestamp;
 
 public class Inventory {
-    public int inventory_id;
-    public int film_id;
-    public int store_id;
-    public Timestamp last_update;
+    public String inventory_id;
+    public String film_id;
+    public String store_id;
+    public String last_update;
 
-    Inventory(int inventory_id, int film_id, int store_id, Timestamp last_update) {
+    Inventory(String inventory_id, String film_id, String store_id, String last_update) {
         this.inventory_id = inventory_id;
         this.film_id = film_id;
         this.store_id = store_id;

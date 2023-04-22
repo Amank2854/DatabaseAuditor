@@ -6,8 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="91977d25-77ed-4d47-ab72-87830ac9b853" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Models/Mod.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Models/Mod.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Models/Staff.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Models/Staff.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Actor.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Actor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Address.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Address.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Instances.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Instances.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/WorkBench.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/WorkBench.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
