@@ -4,17 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9c9caa0b-cbe2-4fb0-bcd6-39469a10c6f4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="91977d25-77ed-4d47-ab72-87830ac9b853" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Database.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Database.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/MongoDB.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/MongoDB.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/PostgreSQL.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/PostgreSQL.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/WorkBench.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/WorkBench.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Database.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Database.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/MongoDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/MongoDB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/PostgreSQL.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/PostgreSQL.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/WorkBench.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/WorkBench.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Models/Mod.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Models/Mod.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Models/Staff.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Models/Staff.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,12 +24,24 @@
       <state>
         <projects_view>
           <tree_state>
-            <expand />
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="DatabaseAuditor" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
             <select />
           </tree_state>
         </projects_view>
       </state>
     </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -45,6 +50,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2OkFs1y9Nm16XvzQ7h9NZoJBiBJ" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />

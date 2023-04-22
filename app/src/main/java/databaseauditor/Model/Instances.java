@@ -1,4 +1,4 @@
-package databaseauditor.Models;
+package databaseauditor.Model;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
