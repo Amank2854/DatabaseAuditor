@@ -45,7 +45,7 @@ public class Analyzer {
             postgres_times.add(Long.toString(this.utils.getElapsedTime(postgres, "insertOne", args, false)));
             mongo_times.add(Long.toString(this.utils.getElapsedTime(mongo, "insertOne", args, false)));
         }
-        
+
         for (int i = 0; i < numIterations; i++) {
             System.out.println("Entity: " + entity_type.get(i));
             System.out.println("PostgreSQL: " + postgres_times.get(i) + "ns");

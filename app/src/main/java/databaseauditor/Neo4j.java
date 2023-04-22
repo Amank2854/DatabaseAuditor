@@ -18,20 +18,23 @@ public class Neo4j implements Database {
     String url = "bolt://localhost:7687";
     String user = "neo4j";
     String password = "database_auditor";
+
     @Override
     public boolean connect(String url, String username, String password) {
         driver = GraphDatabase.driver(url, AuthTokens.basic(user, password));
         return true;
     }
+
     @Override
     public void disconnect() {
         driver.close();
     }
+
     public <T> int insertOne(T obj) {
         Field[] fields = obj.getClass().getDeclaredFields();
 
         String label = obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1];
-        List<String> propertyKey= new ArrayList<>();
+        List<String> propertyKey = new ArrayList<>();
         List<Object> propertyValue = new ArrayList<>();
 
         for (Field field : fields) {
@@ -50,7 +53,7 @@ public class Neo4j implements Database {
         String query = "CREATE (n:" + label + " {";
         for (int i = 0; i < propertyKey.size(); i++) {
             query = query + propertyKey.get(i) + ": \"" + propertyValue.get(i).toString() + "\"";
-            if(i != propertyKey.size() - 1) {
+            if (i != propertyKey.size() - 1) {
                 query = query + ", ";
             }
         }
@@ -152,7 +155,7 @@ public class Neo4j implements Database {
         return 1;
     }
 
-    public <T> int select(T obj, List<List<String>> params, List<String> reqCols){
+    public <T> int select(T obj, List<List<String>> params, List<String> reqCols) {
         return 1;
     }
 }
