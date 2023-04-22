@@ -1,5 +1,6 @@
 package databaseauditor;
 
+import databaseauditor.Analyzer.Analyzer;
 import databaseauditor.Database.Init;
 import databaseauditor.Model.Instances;
 
@@ -9,5 +10,7 @@ public class WorkBench {
         Instances instances = new Instances();
         init.postgreSQL(instances.data);
         init.mongoDB(instances.data);
+        Analyzer analyzer = new Analyzer();
+        analyzer.create(instances.data, 10);
     }
 }
