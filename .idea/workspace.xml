@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="91977d25-77ed-4d47-ab72-87830ac9b853" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Actor.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Actor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Address.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Address.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Instances.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Model/Instances.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/WorkBench.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/WorkBench.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Neo4j.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Neo4j.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,12 +24,7 @@
       <state>
         <projects_view>
           <tree_state>
-            <expand>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="DatabaseAuditor" type="f1a62948:ProjectNode" />
-              </path>
-            </expand>
+            <expand />
             <select />
           </tree_state>
         </projects_view>
@@ -93,5 +86,16 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

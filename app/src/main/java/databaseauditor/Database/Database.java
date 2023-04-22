@@ -2,7 +2,7 @@ package databaseauditor.Database;
 
 import java.util.List;
 
-interface Database {
+public interface Database {
     public boolean connect(String url, String username, String password);
 
     public void disconnect();
