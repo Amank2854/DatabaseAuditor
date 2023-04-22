@@ -1,4 +1,4 @@
-package databaseauditor;
+package databaseauditor.Database;
 
 import databaseauditor.Database.Database;
 import org.neo4j.driver.AuthTokens;
@@ -153,6 +153,7 @@ public class Neo4j implements Database {
     }
 
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols){
+        
         return 1;
     }
 }
