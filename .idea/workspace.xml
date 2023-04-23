@@ -5,45 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="91977d25-77ed-4d47-ab72-87830ac9b853" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Analyzer/Analyzer.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Actor.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Address.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Category.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/City.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Country.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Customer.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Film.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/FilmActor.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/FilmCategory.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Instances.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Inventory.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Language.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Payment.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Rental.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Staff.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Model/Store.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Neo4j.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Analyzer/Analyzer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Database/Database.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/Database/Database.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Actor.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Address.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Category.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/City.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Country.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Customer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Film.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/FilmActor.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/FilmCategory.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Instances.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Inventory.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Language.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Payment.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Rental.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Staff.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/Models/Store.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/bin/main/databaseauditor/WorkBench.class" beforeDir="false" afterPath="$PROJECT_DIR$/app/bin/main/databaseauditor/WorkBench.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Database/Neo4j.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/Database/Neo4j.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/databaseauditor/WorkBench.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/databaseauditor/WorkBench.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +69,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="9c9caa0b-cbe2-4fb0-bcd6-39469a10c6f4" name="Changes" comment="" />
+      <changelist id="91977d25-77ed-4d47-ab72-87830ac9b853" name="Changes" comment="" />
       <created>1682096876739</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -117,6 +79,7 @@
       <workItem from="1682193432411" duration="41000" />
       <workItem from="1682193483976" duration="255000" />
       <workItem from="1682193757797" duration="1199000" />
+      <workItem from="1682253829609" duration="24000" />
     </task>
     <servers />
   </component>
