@@ -59,11 +59,11 @@ public class Utilities {
                             System.out.println("INFO: " + methodName + " for "
                                     + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
                                             - 1]
-                                    + " succeeded in " + (endMemory - startMemory) + " bytes" + " with " + result
+                                    + " succeeded in " + Math.max(endMemory - startMemory, 0) + " bytes" + " with " + result
                                     + " row(s) affected");
                         }
                     }
-                    return endMemory - startMemory;
+                    return Math.max(endMemory - startMemory, 0);
                 }
             }
             return -1;

@@ -13,5 +13,8 @@ public class WorkBench {
 
         Analyzer analyzer = new Analyzer();
         analyzer.create(instances.data, 200);
+        analyzer.update(instances.data, 200);
+        analyzer.delete(instances.data, 200);
+        analyzer.read(instances.data, 200);
     }
 }
