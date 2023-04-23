@@ -15,6 +15,7 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-sync:4.9.0")
     implementation("org.mongodb:bson:4.2.3")
     implementation ("org.neo4j.driver:neo4j-java-driver:5.6.0")
+    implementation("org.jfree:jfreechart:1.5.3")
 }
 
 application {

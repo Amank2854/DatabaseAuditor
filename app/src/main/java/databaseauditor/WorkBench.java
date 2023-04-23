@@ -10,7 +10,8 @@ public class WorkBench {
         Instances instances = new Instances();
         init.postgreSQL(instances.data);
         init.mongoDB(instances.data);
+
         Analyzer analyzer = new Analyzer();
-        analyzer.create(instances.data, 10);
+        analyzer.create(instances.data, 200);
     }
 }
