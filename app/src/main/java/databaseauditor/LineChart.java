@@ -2,6 +2,7 @@ package databaseauditor;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.plot.PlotOrientation;
@@ -18,17 +19,19 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.io.File;
 import java.util.List;
 
 public class LineChart extends JFrame {
-    public LineChart(long[] x, List<long[]> y, List<String> label, String x_label, String y_label, String title) {
-        initUI(x, y, label, x_label, y_label, title);
+    public LineChart(long[] x, List<long[]> y, List<String> label, String x_label, String y_label, String title,
+            String path) {
+        initUI(x, y, label, x_label, y_label, title, path);
     }
 
     private void initUI(long[] x, List<long[]> y, List<String> label, String x_label, String y_label,
-            String title) {
+            String title, String path) {
         XYDataset dataset = createDataset(x, y, label);
-        JFreeChart chart = createChart(dataset, label, x_label, y_label, title);
+        JFreeChart chart = createChart(dataset, label, x_label, y_label, title, path);
 
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -51,12 +54,12 @@ public class LineChart extends JFrame {
 
             dataset.addSeries(series);
         }
-        
+
         return dataset;
     }
 
     private JFreeChart createChart(XYDataset dataset, List<String> label, String x_label, String y_label,
-            String title) {
+            String title, String path) {
         JFreeChart chart = ChartFactory.createXYLineChart(
                 title,
                 x_label,
@@ -87,13 +90,18 @@ public class LineChart extends JFrame {
         chart.setTitle(new TextTitle(title,
                 new Font("Serif", java.awt.Font.BOLD, 18)));
 
+        try {
+            ChartUtils.saveChartAsPNG(new File(path), chart, 1000, 600);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
         return chart;
     }
 
     public static void plot(long[] x, List<long[]> y, List<String> label, String x_label, String y_label,
-            String title) {
+            String title, String path) {
         EventQueue.invokeLater(() -> {
-            var ex = new LineChart(x, y, label, x_label, y_label, title);
+            var ex = new LineChart(x, y, label, x_label, y_label, title, path);
             ex.setVisible(true);
         });
     }

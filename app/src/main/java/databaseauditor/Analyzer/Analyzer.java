@@ -16,6 +16,7 @@ public class Analyzer {
     PostgreSQL postgres = new PostgreSQL();
     MongoDB mongo = new MongoDB();
     Utilities utils = new Utilities();
+    String output_dir = System.getProperty("user.dir") + "/src/charts/";
     int max_num = 10000, min_num = 1;
 
     public Analyzer() {
@@ -59,11 +60,11 @@ public class Analyzer {
         List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
         List<long[]> times = Arrays.asList(postgres_times, mongo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Insertions", "Time (ns)",
-                "Execution Time");
+                "Execution Time", output_dir + "basic_insertion_times.png");
 
         // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
         // LineChart.plot(idx, memory, labels, "Number Of Basic Insertions", "Memory (bytes)",
-        //         "Memory Consumption");
+        //         "Memory Consumption", output_dir + "basic_insertion_memory.png");
     }
 
     public void update(List<Object> entities, int numIterations) {
@@ -105,11 +106,11 @@ public class Analyzer {
         List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
         List<long[]> times = Arrays.asList(postgres_times, mongo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Updates", "Time (ns)",
-                "Execution Time");
+                "Execution Time", output_dir + "basic_update_times.png");
 
         // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
         // LineChart.plot(idx, memory, labels, "Number Of Basic Updates", "Memory (bytes)",
-        //         "Memory Consumption");
+        //         "Memory Consumption", output_dir + "basic_update_memory.png");
     }
 
     public void delete(List<Object> entities, int numIterations) {
@@ -138,11 +139,11 @@ public class Analyzer {
         List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
         List<long[]> times = Arrays.asList(postgres_times, mongo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Deletes", "Time (ns)",
-                "Execution Time");
+                "Execution Time", output_dir + "basic_delete_times.png");
 
         // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
         // LineChart.plot(idx, memory, labels, "Number Of Basic Deletes", "Memory (bytes)",
-        //         "Memory Consumption");
+        //         "Memory Consumption", output_dir + "basic_delete_memory.png");
     }
 
     public void read(List<Object> entities, int numIterations) {
@@ -174,10 +175,10 @@ public class Analyzer {
         List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
         List<long[]> times = Arrays.asList(postgres_times, mongo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Reads", "Time (ns)",
-                "Execution Time");
+                "Execution Time", output_dir + "basic_read_times.png");
 
         // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
         // LineChart.plot(idx, memory, labels, "Number Of Basic Reads", "Memory (bytes)",
-        //         "Memory Consumption");
+        //         "Memory Consumption", output_dir + "basic_read_memory.png");
     }
 }
