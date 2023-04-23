@@ -60,11 +60,11 @@ public class Analyzer {
         List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
         List<long[]> times = Arrays.asList(postgres_times, mongo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Insertions", "Time (ns)",
-                "Execution Time", output_dir + "basic_insertion_times.png");
+                "Execution Time", output_dir + "basic_insert_times.png");
 
         // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
         // LineChart.plot(idx, memory, labels, "Number Of Basic Insertions", "Memory (bytes)",
-        //         "Memory Consumption", output_dir + "basic_insertion_memory.png");
+        //         "Memory Consumption", output_dir + "basic_insert_memory.png");
     }
 
     public void update(List<Object> entities, int numIterations) {
