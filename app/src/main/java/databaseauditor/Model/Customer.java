@@ -1,6 +1,5 @@
 package databaseauditor.Model;
 
-
 public class Customer {
     public String customer_id;
     public String store_id;
@@ -13,8 +12,9 @@ public class Customer {
     public String last_update;
     public String active;
 
-    Customer(String customer_id, String store_id, String first_name, String last_name, String email, String address_id,
-             String activebool, String create_date, String last_update, String active) {
+    public Customer(String customer_id, String store_id, String first_name, String last_name, String email,
+            String address_id,
+            String activebool, String create_date, String last_update, String active) {
         this.customer_id = customer_id;
         this.store_id = store_id;
         this.first_name = first_name;

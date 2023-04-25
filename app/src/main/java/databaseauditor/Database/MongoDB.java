@@ -28,20 +28,15 @@ public class MongoDB implements Database {
     Utilities util = new Utilities();
 
     @Override
-    public boolean connect(String url, String username, String password) {
+    public void connect(String url, String username, String password) throws Exception {
         if (this.database != null) {
             return true;
         }
 
-        try {
-            Dotenv dotenv = Dotenv.load();
-            MongoClient mongo = new MongoClient(new MongoClientURI(url));
-            this.database = mongo.getDatabase(dotenv.get("DB_NAME"));
-            return true;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
+        Dotenv dotenv = Dotenv.load();
+        MongoClient mongo = new MongoClient(new MongoClientURI(url));
+        this.database = mongo.getDatabase(dotenv.get("DB_NAME"));
+        return true;
     }
 
     @Override
@@ -50,49 +45,32 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public <T> int insertOne(T obj) {
+    public <T> int insertOne(T obj) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(
                         obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]));
         Document document = new Document();
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
-            try {
-                document.append(field.getName().toString(), field.get(obj).toString());
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            } catch (IllegalAccessException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            document.append(field.getName().toString(), field.get(obj).toString());
         }
 
-        try {
-            collection.insertOne(document);
-            return 1;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        collection.insertOne(document);
+        return 1;
     }
 
     @Override
-    public <T> int updateMany(T obj, List<List<String>> params) {
+    public <T> int updateMany(T obj, List<List<String>> params) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
                         - 1]));
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
         List<Bson> updates = new ArrayList<>();
+
         for (Field field : fields) {
-            try {
-                fieldNames.add(field.getName().toString());
-                updates.add(Updates.set(field.getName().toString(), field.get(obj).toString()));
-            } catch (IllegalAccessException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            fieldNames.add(field.getName().toString());
+            updates.add(Updates.set(field.getName().toString(), field.get(obj).toString()));
         }
 
         Bson filter = null;
@@ -105,22 +83,16 @@ public class MongoDB implements Database {
                 }
 
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
-        try {
-            UpdateResult result = collection.updateMany(filter, Updates.combine(updates));
-            return (int) result.getModifiedCount();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        UpdateResult result = collection.updateMany(filter, Updates.combine(updates));
+        return (int) result.getModifiedCount();
     }
 
     @Override
-    public <T> int deleteMany(T obj, List<List<String>> params) {
+    public <T> int deleteMany(T obj, List<List<String>> params) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
                         - 1]));
@@ -140,27 +112,22 @@ public class MongoDB implements Database {
                 }
 
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
-        try {
-            DeleteResult result = collection.deleteMany(filter);
-            return (int) result.getDeletedCount();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        DeleteResult result = collection.deleteMany(filter);
+        return (int) result.getDeletedCount();
     }
 
     @Override
-    public <T> int select(T obj, List<List<String>> params, List<String> reqCols) {
+    public <T> int select(T obj, List<List<String>> params, List<String> reqCols) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
                         - 1]));
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
+
         for (Field field : fields) {
             fieldNames.add(field.getName().toString());
         }
@@ -175,8 +142,7 @@ public class MongoDB implements Database {
                 }
 
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
@@ -185,18 +151,12 @@ public class MongoDB implements Database {
             if (fieldNames.contains(col)) {
                 projection.append(col, 1);
             } else {
-                System.out.println("INVALID FIELD: " + col);
-                return -1;
+                throw new Exception("Invalid field: " + col);
             }
         }
 
-        try {
-            ArrayList<Document> results = collection.find(filter).projection(projection)
-                    .into(new ArrayList<Document>());
-            return results.size();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        ArrayList<Document> results = collection.find(filter).projection(projection)
+                .into(new ArrayList<Document>());
+        return results.size();
     }
 }

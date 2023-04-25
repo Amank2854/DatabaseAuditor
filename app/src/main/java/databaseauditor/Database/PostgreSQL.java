@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,47 +15,28 @@ public class PostgreSQL implements Database {
     Utilities util = new Utilities();
 
     @Override
-    public boolean connect(String url, String username, String password) {
+    public boolean connect(String url, String username, String password) throws Exception {
         if (this.conn != null) {
             return true;
         }
 
-        try {
-            this.conn = DriverManager.getConnection(url, username, password);
-            return true;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
+        this.conn = DriverManager.getConnection(url, username, password);
+        return true;
     }
 
     @Override
-    public void disconnect() {
-        if (this.conn != null) {
-            try {
-                this.conn.close();
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
-        }
+    public void disconnect() throws Exception {
+        this.conn.close();
     }
 
     @Override
-    public <T> int insertOne(T obj) {
+    public <T> int insertOne(T obj) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         String columns = "(", values = "(";
 
         for (Field field : fields) {
-            try {
-                columns = columns + field.getName().toString() + ", ";
-                values = values + "'" + field.get(obj).toString() + "', ";
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            } catch (IllegalAccessException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            columns = columns + field.getName().toString() + ", ";
+            values = values + "'" + field.get(obj).toString() + "', ";
         }
 
         columns = columns.substring(0, columns.length() - 2) + ")";
@@ -65,35 +45,22 @@ public class PostgreSQL implements Database {
                 obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " "
                 + columns + " values " + values + ";";
 
-        try {
-            PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            stmt.execute();
-            return 1;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_UPDATABLE);
+        stmt.execute();
+        return 1;
     }
 
     @Override
-    public <T> int updateMany(T obj, List<List<String>> params) {
+    public <T> int updateMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
         String updates = "", conditions = "";
 
         for (Field field : fields) {
-            try {
-                fieldNames.add(field.getName().toString());
-                updates = updates + field.getName().toString() + " = ";
-                updates = updates + "'" + field.get(obj).toString() + "', ";
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            } catch (IllegalAccessException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            fieldNames.add(field.getName().toString());
+            updates = updates + field.getName().toString() + " = ";
+            updates = updates + "'" + field.get(obj).toString() + "', ";
         }
 
         for (List<String> param : params) {
@@ -112,29 +79,19 @@ public class PostgreSQL implements Database {
                 obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " set "
                 + updates + " where" + conditions + ";";
 
-        try {
-            PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            return stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_UPDATABLE);
+        return stmt.executeUpdate();
     }
 
     @Override
-    public <T> int deleteMany(T obj, List<List<String>> params) {
+    public <T> int deleteMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
         String conditions = "";
 
         for (Field field : fields) {
-            try {
-                fieldNames.add(field.getName().toString());
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            fieldNames.add(field.getName().toString());
         }
 
         for (List<String> param : params) {
@@ -152,18 +109,13 @@ public class PostgreSQL implements Database {
                 obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " where"
                 + conditions + ";";
 
-        try {
-            PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            return stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        PreparedStatement stmt = this.conn.prepareCall(sql, ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_UPDATABLE);
+        return stmt.executeUpdate();
     }
 
     @Override
-    public <T> int select(T obj, List<List<String>> params, List<String> reqCols) {
+    public <T> int select(T obj, List<List<String>> params, List<String> reqCols) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
         String columns = "", conditions = "";
@@ -202,21 +154,16 @@ public class PostgreSQL implements Database {
                 obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1]) + " where"
                 + conditions + ";";
 
-        try {
-            PreparedStatement stmt = this.conn.prepareCall(sql,
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
-            ResultSet result = stmt.executeQuery();
+        PreparedStatement stmt = this.conn.prepareCall(sql,
+                ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_UPDATABLE);
+        ResultSet result = stmt.executeQuery();
 
-            int count = 0;
-            if (result.last()) {
-                count = result.getRow();
-                result.beforeFirst();
-            }
-            return count;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return -1;
+        int count = 0;
+        if (result.last()) {
+            count = result.getRow();
+            result.beforeFirst();
         }
+        return count;
     }
 }

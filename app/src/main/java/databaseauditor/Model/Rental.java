@@ -9,7 +9,7 @@ public class Rental {
     public String staff_id;
     public String last_update;
 
-    Rental(String rental_id, String rental_date, String inventory_id, String customer_id, String return_date, String staff_id,
+    public Rental(String rental_id, String rental_date, String inventory_id, String customer_id, String return_date, String staff_id,
            String last_update) {
         this.rental_id = rental_id;
         this.rental_date = rental_date;

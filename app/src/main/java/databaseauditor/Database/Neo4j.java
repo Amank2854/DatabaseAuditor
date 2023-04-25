@@ -20,46 +20,35 @@ import java.util.*;
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4j implements Database {
-    private Driver driver;
-    String url = "bolt://localhost:7687";
-    String user = "neo4j";
-    String password = "database_auditor";
+    Driver driver = null;
 
     @Override
-    public boolean connect(String url, String username, String password) {
-        try {
-            driver = GraphDatabase.driver(url, AuthTokens.basic(user, password));
+    public boolean connect(String url, String username, String password) throws Exception {
+        if (driver != null) {
             return true;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return false;
         }
+
+        driver = GraphDatabase.driver(url, AuthTokens.basic(username, password));
+        return true;
     }
 
     @Override
-    public void disconnect() {
+    public void disconnect() throws Exception {
         driver.close();
     }
 
-    public <T> int insertOne(T obj) {
+    public <T> int insertOne(T obj) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> propertyKey = new ArrayList<>();
         List<Object> propertyValue = new ArrayList<>();
 
         for (Field field : fields) {
-            try {
-                propertyKey.add(field.getName().toString());
-                propertyValue.add(field.get(obj).toString());
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            } catch (IllegalAccessException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            propertyKey.add(field.getName().toString());
+            propertyValue.add(field.get(obj).toString());
         }
 
-        String query = "CREATE (n:" + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {";
+        String query = "CREATE (n:"
+                + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {";
         for (int i = 0; i < propertyKey.size(); i++) {
             query = query + propertyKey.get(i) + ": \"" + propertyValue.get(i).toString() + "\"";
             if (i != propertyKey.size() - 1) {
@@ -68,35 +57,21 @@ public class Neo4j implements Database {
         }
 
         query = query + "});";
-        try (Session session = driver.session()) {
-            String finalQuery = query;
-            session.writeTransaction(tx -> tx.run(finalQuery));
-            return 1;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        session.writeTransaction(tx -> tx.run(query));
+        return 1;
     }
 
     @Override
-    public <T> int updateMany(T obj, List<List<String>> params) {
+    public <T> int updateMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
         String updates = "", conditions = "";
         int noOfFields = fields.length;
 
         for (Field field : fields) {
-            try {
-                fieldNames.add(field.getName().toString());
-                updates = updates + "n." + field.getName().toString() + " = ";
-                updates = updates + "\"" + field.get(obj).toString() + "\", ";
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            } catch (IllegalAccessException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            fieldNames.add(field.getName().toString());
+            updates = updates + "n." + field.getName().toString() + " = ";
+            updates = updates + "\"" + field.get(obj).toString() + "\", ";
         }
 
         for (List<String> param : params) {
@@ -108,33 +83,25 @@ public class Neo4j implements Database {
                 return -1;
             }
         }
+
         updates = updates.substring(0, updates.length() - 2);
         conditions = conditions.substring(0, conditions.length() - 2);
-        String query = "MATCH (n:" + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {" + conditions + "}) " + " set " + updates + ";";
-        try (Session session = driver.session()) {
-            String finalQuery = query;
-            Result result = session.writeTransaction(tx -> tx.run(finalQuery));
-            int nodesUpdated = (result.consume().counters().propertiesSet())/noOfFields;
-            return nodesUpdated;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        String query = "MATCH (n:"
+                + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {"
+                + conditions + "}) " + " set " + updates + ";";
+        Result result = session.writeTransaction(tx -> tx.run(query));
+        int nodesUpdated = (result.consume().counters().propertiesSet()) / noOfFields;
+        return nodesUpdated;
     }
 
     @Override
-    public <T> int deleteMany(T obj, List<List<String>> params) {
+    public <T> int deleteMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
         String conditions = "";
 
         for (Field field : fields) {
-            try {
-                fieldNames.add(field.getName().toString());
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            fieldNames.add(field.getName().toString());
         }
 
         for (List<String> param : params) {
@@ -148,30 +115,21 @@ public class Neo4j implements Database {
         }
 
         conditions = conditions.substring(0, conditions.length() - 2);
-        String query = "MATCH (n:" + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {" + conditions + "}) " + " delete n;";
-        try (Session session = driver.session()) {
-            String finalQuery = query;
-            Result resultSummary = session.writeTransaction(tx -> tx.run(finalQuery));
-            SummaryCounters counters = resultSummary.consume().counters();
-            return counters.nodesDeleted();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
+        String query = "MATCH (n:"
+                + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {"
+                + conditions + "}) " + " delete n;";
+        Result resultSummary = session.writeTransaction(tx -> tx.run(query));
+        SummaryCounters counters = resultSummary.consume().counters();
+        return counters.nodesDeleted();
     }
 
-    public <T> int select(T obj, List<List<String>> params, List<String> reqCols){
+    public <T> int select(T obj, List<List<String>> params, List<String> reqCols) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
         String columns = "", conditions = "";
 
         for (Field field : fields) {
-            try {
-                fieldNames.add(field.getName().toString());
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                return -1;
-            }
+            fieldNames.add(field.getName().toString());
         }
 
         for (List<String> param : params) {
@@ -186,7 +144,7 @@ public class Neo4j implements Database {
 
         for (String reqCol : reqCols) {
             if (fieldNames.contains(reqCol)) {
-                columns = columns + "n."+reqCol + ", ";
+                columns = columns + "n." + reqCol + ", ";
             } else {
                 System.out.println("INVALID COLUMN: " + reqCol);
                 return -1;
@@ -195,20 +153,15 @@ public class Neo4j implements Database {
 
         columns = columns.substring(0, columns.length() - 2);
         conditions = conditions.substring(0, conditions.length() - 2);
-
-        String query = "MATCH (n:" + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {" + conditions + "}) " + " return " + columns + ";";
-        try (Session session = driver.session()) {
-            String finalQuery = query;
-            Result result = session.run(finalQuery);
-            int count = 0;
-            while (result.hasNext()) {
-                Record record = result.next();
-                count++;
-            }
-            return count;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return -1;
+        String query = "MATCH (n:"
+                + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {"
+                + conditions + "}) " + " return " + columns + ";";
+        Result result = session.run(query);
+        int count = 0;
+        while (result.hasNext()) {
+            Record record = result.next();
+            count++;
         }
+        return count;
     }
 }

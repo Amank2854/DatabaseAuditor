@@ -15,9 +15,9 @@ public class Film {
     public String special_features;
     public String last_update;
 
-    Film(String film_id, String title, String description, String release_year, String language_id, String fulltext,
-         String rental_duration, String rental_rate, String length, String replacement_cost, String rating,
-         String special_features, String last_update) {
+    public Film(String film_id, String title, String description, String release_year, String language_id, String fulltext,
+            String rental_duration, String rental_rate, String length, String replacement_cost, String rating,
+            String special_features, String last_update) {
         this.film_id = film_id;
         this.title = title;
         this.description = description;

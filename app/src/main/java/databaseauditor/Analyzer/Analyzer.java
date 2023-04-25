@@ -19,13 +19,13 @@ public class Analyzer {
     String output_dir = System.getProperty("user.dir") + "/src/charts/";
     int max_num = 10000, min_num = 1;
 
-    public Analyzer() {
+    public Analyzer() throws Exception {
         postgres.connect(this.dotenv.get("POSTGRES_URL") + this.dotenv.get("DB_NAME"), this.dotenv.get("POSTGRES_USER"),
                 this.dotenv.get("POSTGRES_PASSWORD"));
         mongo.connect(this.dotenv.get("MONGODB_URI"), "", "");
     }
 
-    public void create(List<Object> entities, int numIterations) {
+    public void create(List<Object> entities, int numIterations) throws Exception {
         List<String> entity_type = new ArrayList<String>();
         long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
         long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
@@ -37,16 +37,8 @@ public class Analyzer {
             Field[] fields = entity.getClass().getDeclaredFields();
 
             for (Field field : fields) {
-                try {
-                    int random_int = (int) Math.floor(Math.random() * (max_num - min_num + 1) + min_num);
-                    field.set(entity, Integer.toString(random_int));
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                    return;
-                } catch (IllegalAccessException e) {
-                    System.out.println(e.getMessage());
-                    return;
-                }
+                int random_int = (int) Math.floor(Math.random() * (max_num - min_num + 1) + min_num);
+                field.set(entity, Integer.toString(random_int));
             }
 
             Object[] args = { entity };
@@ -62,91 +54,12 @@ public class Analyzer {
         LineChart.plot(idx, times, labels, "Number Of Basic Insertions", "Time (ns)",
                 "Execution Time", output_dir + "basic_insert_times.png");
 
-        // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
-        // LineChart.plot(idx, memory, labels, "Number Of Basic Insertions", "Memory (bytes)",
-        //         "Memory Consumption", output_dir + "basic_insert_memory.png");
+        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
+        LineChart.plot(idx, memory, labels, "Number Of Basic Insertions", "Memory (bytes)",
+                "Memory Consumption", output_dir + "basic_insert_memory.png");
     }
 
-    public void update(List<Object> entities, int numIterations) {
-        List<String> entity_type = new ArrayList<String>();
-        long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
-        long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
-        long[] idx = new long[numIterations];
-
-        for (int i = 0; i < numIterations; i++) {
-            Object entity = entities.get((int) Math.floor(Math.random() * (entities.size())));
-            entity_type.add(entity.getClass().getSimpleName());
-            Field[] fields = entity.getClass().getDeclaredFields();
-
-            for (Field field : fields) {
-                try {
-                    int random_int = (int) Math.floor(Math.random() * (max_num - min_num + 1) + min_num);
-                    field.set(entity, Integer.toString(random_int));
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                    return;
-                } catch (IllegalAccessException e) {
-                    System.out.println(e.getMessage());
-                    return;
-                }
-            }
-
-            List<List<String>> conditions = new ArrayList<List<String>>();
-            conditions.add(Arrays.asList(fields[0].getName().toString(),
-                    Integer.toString((int) Math.floor(Math.random() * (max_num - min_num + 1) + min_num))));
-
-            Object[] args = { entity, conditions };
-            postgres_times[i] = this.utils.getElapsedTime(postgres, "updateMany", args, false);
-            postgres_memory[i] = this.utils.getConsumedMemory(postgres, "updateMany", args, false);
-            mongo_times[i] = this.utils.getElapsedTime(mongo, "updateMany", args, false);
-            mongo_memory[i] = this.utils.getConsumedMemory(mongo, "updateMany", args, false);
-            idx[i] = i + 1;
-        }
-
-        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
-        List<long[]> times = Arrays.asList(postgres_times, mongo_times);
-        LineChart.plot(idx, times, labels, "Number Of Basic Updates", "Time (ns)",
-                "Execution Time", output_dir + "basic_update_times.png");
-
-        // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
-        // LineChart.plot(idx, memory, labels, "Number Of Basic Updates", "Memory (bytes)",
-        //         "Memory Consumption", output_dir + "basic_update_memory.png");
-    }
-
-    public void delete(List<Object> entities, int numIterations) {
-        List<String> entity_type = new ArrayList<String>();
-        long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
-        long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
-        long[] idx = new long[numIterations];
-
-        for (int i = 0; i < numIterations; i++) {
-            Object entity = entities.get((int) Math.floor(Math.random() * (entities.size())));
-            entity_type.add(entity.getClass().getSimpleName());
-            Field[] fields = entity.getClass().getDeclaredFields();
-
-            List<List<String>> conditions = new ArrayList<List<String>>();
-            conditions.add(Arrays.asList(fields[0].getName().toString(),
-                    Integer.toString((int) Math.floor(Math.random() * (max_num - min_num + 1) + min_num))));
-
-            Object[] args = { entity, conditions };
-            postgres_times[i] = this.utils.getElapsedTime(postgres, "deleteMany", args, false);
-            postgres_memory[i] = this.utils.getConsumedMemory(postgres, "deleteMany", args, false);
-            mongo_times[i] = this.utils.getElapsedTime(mongo, "deleteMany", args, false);
-            mongo_memory[i] = this.utils.getConsumedMemory(mongo, "deleteMany", args, false);
-            idx[i] = i + 1;
-        }
-
-        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
-        List<long[]> times = Arrays.asList(postgres_times, mongo_times);
-        LineChart.plot(idx, times, labels, "Number Of Basic Deletes", "Time (ns)",
-                "Execution Time", output_dir + "basic_delete_times.png");
-
-        // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
-        // LineChart.plot(idx, memory, labels, "Number Of Basic Deletes", "Memory (bytes)",
-        //         "Memory Consumption", output_dir + "basic_delete_memory.png");
-    }
-
-    public void read(List<Object> entities, int numIterations) {
+    public void read(List<Object> entities, int numIterations) throws Exception {
         List<String> entity_type = new ArrayList<String>();
         long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
         long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
@@ -177,8 +90,79 @@ public class Analyzer {
         LineChart.plot(idx, times, labels, "Number Of Basic Reads", "Time (ns)",
                 "Execution Time", output_dir + "basic_read_times.png");
 
-        // List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
-        // LineChart.plot(idx, memory, labels, "Number Of Basic Reads", "Memory (bytes)",
-        //         "Memory Consumption", output_dir + "basic_read_memory.png");
+        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
+        LineChart.plot(idx, memory, labels, "Number Of Basic Reads", "Memory (bytes)",
+                "Memory Consumption", output_dir + "basic_read_memory.png");
+    }
+
+    public void update(List<Object> entities, int numIterations) throws Exception {
+        List<String> entity_type = new ArrayList<String>();
+        long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
+        long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
+        long[] idx = new long[numIterations];
+
+        for (int i = 0; i < numIterations; i++) {
+            Object entity = entities.get((int) Math.floor(Math.random() * (entities.size())));
+            entity_type.add(entity.getClass().getSimpleName());
+            Field[] fields = entity.getClass().getDeclaredFields();
+
+            for (Field field : fields) {
+                int random_int = (int) Math.floor(Math.random() * (max_num - min_num + 1) + min_num);
+                field.set(entity, Integer.toString(random_int));
+            }
+
+            List<List<String>> conditions = new ArrayList<List<String>>();
+            conditions.add(Arrays.asList(fields[0].getName().toString(),
+                    Integer.toString((int) Math.floor(Math.random() * (max_num - min_num + 1) + min_num))));
+
+            Object[] args = { entity, conditions };
+            postgres_times[i] = this.utils.getElapsedTime(postgres, "updateMany", args, false);
+            postgres_memory[i] = this.utils.getConsumedMemory(postgres, "updateMany", args, false);
+            mongo_times[i] = this.utils.getElapsedTime(mongo, "updateMany", args, false);
+            mongo_memory[i] = this.utils.getConsumedMemory(mongo, "updateMany", args, false);
+            idx[i] = i + 1;
+        }
+
+        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
+        List<long[]> times = Arrays.asList(postgres_times, mongo_times);
+        LineChart.plot(idx, times, labels, "Number Of Basic Updates", "Time (ns)",
+                "Execution Time", output_dir + "basic_update_times.png");
+
+        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
+        LineChart.plot(idx, memory, labels, "Number Of Basic Updates", "Memory (bytes)",
+                "Memory Consumption", output_dir + "basic_update_memory.png");
+    }
+
+    public void delete(List<Object> entities, int numIterations) throws Exception {
+        List<String> entity_type = new ArrayList<String>();
+        long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
+        long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
+        long[] idx = new long[numIterations];
+
+        for (int i = 0; i < numIterations; i++) {
+            Object entity = entities.get((int) Math.floor(Math.random() * (entities.size())));
+            entity_type.add(entity.getClass().getSimpleName());
+            Field[] fields = entity.getClass().getDeclaredFields();
+
+            List<List<String>> conditions = new ArrayList<List<String>>();
+            conditions.add(Arrays.asList(fields[0].getName().toString(),
+                    Integer.toString((int) Math.floor(Math.random() * (max_num - min_num + 1) + min_num))));
+
+            Object[] args = { entity, conditions };
+            postgres_times[i] = this.utils.getElapsedTime(postgres, "deleteMany", args, false);
+            postgres_memory[i] = this.utils.getConsumedMemory(postgres, "deleteMany", args, false);
+            mongo_times[i] = this.utils.getElapsedTime(mongo, "deleteMany", args, false);
+            mongo_memory[i] = this.utils.getConsumedMemory(mongo, "deleteMany", args, false);
+            idx[i] = i + 1;
+        }
+
+        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
+        List<long[]> times = Arrays.asList(postgres_times, mongo_times);
+        LineChart.plot(idx, times, labels, "Number Of Basic Deletes", "Time (ns)",
+                "Execution Time", output_dir + "basic_delete_times.png");
+
+        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
+        LineChart.plot(idx, memory, labels, "Number Of Basic Deletes", "Memory (bytes)",
+                "Memory Consumption", output_dir + "basic_delete_memory.png");
     }
 }

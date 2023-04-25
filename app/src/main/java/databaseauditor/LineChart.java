@@ -101,8 +101,7 @@ public class LineChart extends JFrame {
     public static void plot(long[] x, List<long[]> y, List<String> label, String x_label, String y_label,
             String title, String path) {
         EventQueue.invokeLater(() -> {
-            var ex = new LineChart(x, y, label, x_label, y_label, title, path);
-            ex.setVisible(true);
+            new LineChart(x, y, label, x_label, y_label, title, path);
         });
     }
 }

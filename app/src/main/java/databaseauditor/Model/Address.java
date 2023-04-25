@@ -1,6 +1,5 @@
 package databaseauditor.Model;
 
-
 public class Address {
     public String address_id;
     public String address;
@@ -11,7 +10,7 @@ public class Address {
     public String phone;
     public String last_update;
 
-    Address(String address_id, String address, String address2, String district, String city_id, String postal_code,
+    public Address(String address_id, String address, String address2, String district, String city_id, String postal_code,
             String phone, String last_update) {
         this.address_id = address_id;
         this.address = address;
