@@ -151,7 +151,7 @@ public class MongoDB implements Database {
             if (fieldNames.contains(col)) {
                 projection.append(col, 1);
             } else {
-                throw new Exception("Invalid field: " + col);
+                throw new Exception("Invalid parameter: " + col);
             }
         }
 

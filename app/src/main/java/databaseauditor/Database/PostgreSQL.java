@@ -68,8 +68,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
@@ -99,8 +98,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
@@ -134,8 +132,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
@@ -143,8 +140,7 @@ public class PostgreSQL implements Database {
             if (fieldNames.contains(reqCol)) {
                 columns = columns + reqCol + ", ";
             } else {
-                System.out.println("INVALID COLUMN: " + reqCol);
-                return -1;
+                throw new Exception("Invalid parameter: " + reqCol);
             }
         }
 

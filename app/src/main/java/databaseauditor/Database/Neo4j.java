@@ -38,27 +38,31 @@ public class Neo4j implements Database {
     }
 
     public <T> int insertOne(T obj) throws Exception {
-        Field[] fields = obj.getClass().getDeclaredFields();
-        List<String> propertyKey = new ArrayList<>();
-        List<Object> propertyValue = new ArrayList<>();
-
-        for (Field field : fields) {
-            propertyKey.add(field.getName().toString());
-            propertyValue.add(field.get(obj).toString());
-        }
-
-        String query = "CREATE (n:"
-                + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {";
-        for (int i = 0; i < propertyKey.size(); i++) {
-            query = query + propertyKey.get(i) + ": \"" + propertyValue.get(i).toString() + "\"";
-            if (i != propertyKey.size() - 1) {
-                query = query + ", ";
+        try {
+            Field[] fields = obj.getClass().getDeclaredFields();
+            List<String> propertyKey = new ArrayList<>();
+            List<Object> propertyValue = new ArrayList<>();
+    
+            for (Field field : fields) {
+                propertyKey.add(field.getName().toString());
+                propertyValue.add(field.get(obj).toString());
             }
+    
+            String query = "CREATE (n:"
+                    + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {";
+            for (int i = 0; i < propertyKey.size(); i++) {
+                query = query + propertyKey.get(i) + ": \"" + propertyValue.get(i).toString() + "\"";
+                if (i != propertyKey.size() - 1) {
+                    query = query + ", ";
+                }
+            }
+    
+            query = query + "});";
+            final String finalQuery = query;
+            session.writeTransaction(tx -> tx.run(finalQuery));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        query = query + "});";
-        final String finalQuery = query;
-        session.writeTransaction(tx -> tx.run(finalQuery));
         return 1;
     }
 
@@ -80,8 +84,7 @@ public class Neo4j implements Database {
                 conditions = conditions + " " + param.get(0) + " : ";
                 conditions = conditions + "\"" + param.get(1) + "\", ";
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
@@ -111,8 +114,7 @@ public class Neo4j implements Database {
                 conditions = conditions + " " + param.get(0) + " : ";
                 conditions = conditions + "\"" + param.get(1) + "\", ";
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
@@ -140,8 +142,7 @@ public class Neo4j implements Database {
                 conditions = conditions + " " + param.get(0) + " : ";
                 conditions = conditions + "\"" + param.get(1) + "\", ";
             } else {
-                System.out.println("INVALID PARAMETER: " + param.get(0));
-                return -1;
+                throw new Exception("Invalid parameter: " + param.get(0));
             }
         }
 
@@ -149,8 +150,7 @@ public class Neo4j implements Database {
             if (fieldNames.contains(reqCol)) {
                 columns = columns + "n." + reqCol + ", ";
             } else {
-                System.out.println("INVALID COLUMN: " + reqCol);
-                return -1;
+                throw new Exception("Invalid parameter: " + reqCol);
             }
         }
 

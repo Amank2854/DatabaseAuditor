@@ -14,11 +14,12 @@ public class WorkBench {
             List<Object> objs = utils.getInstances();
             init.postgreSQL(objs);
             init.mongoDB(objs);
-            // Analyzer analyzer = new Analyzer();
-            // analyzer.create(objs, 200);
-            // analyzer.update(objs, 200);
-            // analyzer.delete(objs, 200);
-            // analyzer.read(objs, 200);
+            init.neo4j(objs);
+            Analyzer analyzer = new Analyzer();
+            analyzer.create(objs, 200);
+            analyzer.read(objs, 200);
+            analyzer.update(objs, 200);
+            analyzer.delete(objs, 200);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

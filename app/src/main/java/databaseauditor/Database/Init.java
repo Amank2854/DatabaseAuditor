@@ -10,6 +10,10 @@ import java.util.logging.Logger;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import org.neo4j.driver.*;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
 
 import databaseauditor.Utilities;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -81,7 +85,21 @@ public class Init {
         System.out.println("MongoDB database created successfully");
     }
 
-    public void neo4j() throws Exception {
-        // TODO
+    public void neo4j(List<Object> nodes) throws Exception {
+        String url = this.dotenv.get("NEO4J_URL");
+        String username = this.dotenv.get("NEO4J_USER");
+        String password = this.dotenv.get("NEO4J_PASSWORD");
+
+        final String finalQuery = "match (n) detach delete n";
+        Session session = GraphDatabase.driver(url, AuthTokens.basic(username, password)).session();
+        session.run(finalQuery);
+
+        Neo4j neo = new Neo4j();
+        neo.connect(url, username, password);
+        for (Object node : nodes) {
+            neo.insertOne(node);
+        }
+
+        System.out.println("Neo4j database created successfully");
     }
 }

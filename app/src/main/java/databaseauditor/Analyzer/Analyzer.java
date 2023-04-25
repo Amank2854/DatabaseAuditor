@@ -8,6 +8,7 @@ import java.util.List;
 import databaseauditor.LineChart;
 import databaseauditor.Utilities;
 import databaseauditor.Database.MongoDB;
+import databaseauditor.Database.Neo4j;
 import databaseauditor.Database.PostgreSQL;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -15,6 +16,7 @@ public class Analyzer {
     Dotenv dotenv = Dotenv.load();
     PostgreSQL postgres = new PostgreSQL();
     MongoDB mongo = new MongoDB();
+    Neo4j neo = new Neo4j();
     Utilities utils = new Utilities();
     String output_dir = System.getProperty("user.dir") + "/src/charts/";
     int max_num = 10000, min_num = 1;
@@ -23,12 +25,14 @@ public class Analyzer {
         postgres.connect(this.dotenv.get("POSTGRES_URL") + this.dotenv.get("DB_NAME"), this.dotenv.get("POSTGRES_USER"),
                 this.dotenv.get("POSTGRES_PASSWORD"));
         mongo.connect(this.dotenv.get("MONGODB_URI"), "", "");
+        neo.connect(this.dotenv.get("NEO4J_URL"), this.dotenv.get("NEO4J_USER"), this.dotenv.get("NEO4J_PASSWORD"));
     }
 
     public void create(List<Object> entities, int numIterations) throws Exception {
         List<String> entity_type = new ArrayList<String>();
         long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
         long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
+        long[] neo_times = new long[numIterations], neo_memory = new long[numIterations];
         long[] idx = new long[numIterations];
 
         for (int i = 0; i < numIterations; i++) {
@@ -46,23 +50,28 @@ public class Analyzer {
             postgres_memory[i] = this.utils.getConsumedMemory(postgres, "insertOne", args, false);
             mongo_times[i] = this.utils.getElapsedTime(mongo, "insertOne", args, false);
             mongo_memory[i] = this.utils.getConsumedMemory(mongo, "insertOne", args, false);
+            neo_times[i] = this.utils.getElapsedTime(neo, "insertOne", args, false);
+            neo_memory[i] = this.utils.getConsumedMemory(neo, "insertOne", args, false);
             idx[i] = i + 1;
         }
 
-        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
-        List<long[]> times = Arrays.asList(postgres_times, mongo_times);
+        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB", "Neo4j");
+        List<long[]> times = Arrays.asList(postgres_times, mongo_times, neo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Insertions", "Time (ns)",
                 "Execution Time", output_dir + "basic_insert_times.png");
 
-        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
+        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory, neo_memory);
         LineChart.plot(idx, memory, labels, "Number Of Basic Insertions", "Memory (bytes)",
                 "Memory Consumption", output_dir + "basic_insert_memory.png");
+
+        System.out.println("Insertion Done");
     }
 
     public void read(List<Object> entities, int numIterations) throws Exception {
         List<String> entity_type = new ArrayList<String>();
         long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
         long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
+        long[] neo_times = new long[numIterations], neo_memory = new long[numIterations];
         long[] idx = new long[numIterations];
 
         for (int i = 0; i < numIterations; i++) {
@@ -82,23 +91,28 @@ public class Analyzer {
             postgres_memory[i] = this.utils.getConsumedMemory(postgres, "select", args, false);
             mongo_times[i] = this.utils.getElapsedTime(mongo, "select", args, false);
             mongo_memory[i] = this.utils.getConsumedMemory(mongo, "select", args, false);
+            neo_times[i] = this.utils.getElapsedTime(neo, "select", args, false);
+            neo_memory[i] = this.utils.getConsumedMemory(neo, "select", args, false);
             idx[i] = i + 1;
         }
 
-        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
-        List<long[]> times = Arrays.asList(postgres_times, mongo_times);
+        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB", "Neo4j");
+        List<long[]> times = Arrays.asList(postgres_times, mongo_times, neo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Reads", "Time (ns)",
                 "Execution Time", output_dir + "basic_read_times.png");
 
-        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
+        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory, neo_memory);
         LineChart.plot(idx, memory, labels, "Number Of Basic Reads", "Memory (bytes)",
                 "Memory Consumption", output_dir + "basic_read_memory.png");
+
+        System.out.println("Read Done");
     }
 
     public void update(List<Object> entities, int numIterations) throws Exception {
         List<String> entity_type = new ArrayList<String>();
         long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
         long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
+        long[] neo_times = new long[numIterations], neo_memory = new long[numIterations];
         long[] idx = new long[numIterations];
 
         for (int i = 0; i < numIterations; i++) {
@@ -120,23 +134,28 @@ public class Analyzer {
             postgres_memory[i] = this.utils.getConsumedMemory(postgres, "updateMany", args, false);
             mongo_times[i] = this.utils.getElapsedTime(mongo, "updateMany", args, false);
             mongo_memory[i] = this.utils.getConsumedMemory(mongo, "updateMany", args, false);
+            neo_times[i] = this.utils.getElapsedTime(neo, "updateMany", args, false);
+            neo_memory[i] = this.utils.getConsumedMemory(neo, "updateMany", args, false);
             idx[i] = i + 1;
         }
 
-        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
-        List<long[]> times = Arrays.asList(postgres_times, mongo_times);
+        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB", "Neo4j");
+        List<long[]> times = Arrays.asList(postgres_times, mongo_times, neo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Updates", "Time (ns)",
                 "Execution Time", output_dir + "basic_update_times.png");
 
-        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
+        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory, neo_memory);
         LineChart.plot(idx, memory, labels, "Number Of Basic Updates", "Memory (bytes)",
                 "Memory Consumption", output_dir + "basic_update_memory.png");
+
+        System.out.println("Update Done");
     }
 
     public void delete(List<Object> entities, int numIterations) throws Exception {
         List<String> entity_type = new ArrayList<String>();
         long[] postgres_times = new long[numIterations], postgres_memory = new long[numIterations];
         long[] mongo_times = new long[numIterations], mongo_memory = new long[numIterations];
+        long[] neo_times = new long[numIterations], neo_memory = new long[numIterations];
         long[] idx = new long[numIterations];
 
         for (int i = 0; i < numIterations; i++) {
@@ -153,16 +172,20 @@ public class Analyzer {
             postgres_memory[i] = this.utils.getConsumedMemory(postgres, "deleteMany", args, false);
             mongo_times[i] = this.utils.getElapsedTime(mongo, "deleteMany", args, false);
             mongo_memory[i] = this.utils.getConsumedMemory(mongo, "deleteMany", args, false);
+            neo_times[i] = this.utils.getElapsedTime(neo, "deleteMany", args, false);
+            neo_memory[i] = this.utils.getConsumedMemory(neo, "deleteMany", args, false);
             idx[i] = i + 1;
         }
 
-        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB");
-        List<long[]> times = Arrays.asList(postgres_times, mongo_times);
+        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB", "Neo4j");
+        List<long[]> times = Arrays.asList(postgres_times, mongo_times, neo_times);
         LineChart.plot(idx, times, labels, "Number Of Basic Deletes", "Time (ns)",
                 "Execution Time", output_dir + "basic_delete_times.png");
 
-        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory);
+        List<long[]> memory = Arrays.asList(postgres_memory, mongo_memory, neo_memory);
         LineChart.plot(idx, memory, labels, "Number Of Basic Deletes", "Memory (bytes)",
                 "Memory Consumption", output_dir + "basic_delete_memory.png");
+
+        System.out.println("Delete Done");
     }
 }
