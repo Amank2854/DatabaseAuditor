@@ -121,5 +121,67 @@ MERGE (address:Address {address_id: row.address_id})
 			address.postal_code = row.postal_code,
 			address.phone = row.phone,
 			address.last_update = row.last_update;
+LOAD CSV WITH HEADERS FROM 'file:///film_actor.csv' AS row
+MATCH (actor:Actor {actor_id: row.actor_id})
+MATCH (film:Film {film_id: row.film_id})
+MERGE (actor)-[o:acted_in]->(film);
 
+LOAD CSV WITH HEADERS FROM 'file:///film_category.csv' AS row
+MATCH (film:Film {film_id: row.film_id})
+MATCH (category:Category {category_id: row.category_id})
+MERGE (film)-[:belongs_to]->(category);
+
+LOAD CSV WITH HEADERS FROM 'file:///film.csv' AS row
+MATCH (film:Film {film_id: row.film_id})
+MATCH (language:Language {language_id: row.language_id})
+MERGE (film)-[:has]->(language);
+
+LOAD CSV WITH HEADERS FROM 'file:///inventory.csv' AS row
+MATCH (film:Film {film_id: row.film_id})
+MATCH (inventory:Inventory {inventory_id: row.inventory_id})
+MERGE (inventory)-[:contains]->(film);
+
+LOAD CSV WITH HEADERS FROM 'file:///rental.csv' AS row
+MATCH (rental:Rental {rental_id: row.rental_id})
+MATCH (inventory:Inventory {inventory_id: row.inventory_id})
+MATCH (customer:Customer {customer_id: row.customer_id})
+MATCH (staff:Staff {staff_id: row.staff_id})
+MERGE (rental)-[:rented]->(inventory)
+MERGE (rental)-[:rented_by]->(customer)
+MERGE (rental)-[:handled_by]->(staff);
+
+LOAD CSV WITH HEADERS FROM 'file:///payment.csv' AS row
+MATCH (rental:Rental {rental_id: row.rental_id})
+MATCH (customer:Customer {customer_id: row.customer_id})
+MATCH (payment:Payment {payment_id: row.payment_id})
+MATCH (staff:Staff {staff_id: row.staff_id})
+MERGE (payment)-[:for]->(rental)
+MERGE (payment)-[:received_by]->(staff)
+MERGE (payment)-[:done_by]->(customer);
+
+LOAD CSV WITH HEADERS FROM 'file:///staff.csv' AS row
+MATCH (store:Store {store_id: row.store_id})
+MATCH (address:Address {address_id: row.address_id})
+MERGE (staff)-[:works_at]->(store)
+MERGE (staff)-[:has_address]->(address);
+
+LOAD CSV WITH HEADERS FROM 'file:///customer.csv' AS row
+MATCH (customer:Customer {customer_id: row.customer_id})
+MATCH (address:Address {address_id: row.address_id})
+MERGE (customer)-[:has_address]->(address);
+
+LOAD CSV WITH HEADERS FROM 'file:///store.csv' AS row
+MATCH (store:Store {store_id: row.store_id})
+MATCH (address:Address {address_id: row.address_id})
+MERGE (store)-[:has_address]->(address);
+
+LOAD CSV WITH HEADERS FROM 'file:///address.csv' AS row
+MATCH (city:City {city_id: row.city_id})
+MATCH (address:Address {address_id: row.address_id})
+MERGE (address)-[:is_in_city]->(city);
+
+LOAD CSV WITH HEADERS FROM 'file:///city.csv' AS row
+MATCH (city:City {city_id: row.city_id})
+MATCH (country:Country {country_id: row.country_id})
+MERGE (city)-[:is_in_country]->(country);
 :exit

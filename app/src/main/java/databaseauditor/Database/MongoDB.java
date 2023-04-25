@@ -28,7 +28,7 @@ public class MongoDB implements Database {
     Utilities util = new Utilities();
 
     @Override
-    public void connect(String url, String username, String password) throws Exception {
+    public boolean connect(String url, String username, String password) throws Exception {
         if (this.database != null) {
             return true;
         }

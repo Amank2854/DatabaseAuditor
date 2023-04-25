@@ -1,23 +1,28 @@
 package databaseauditor;
 
+import java.util.List;
+
+import databaseauditor.Analyzer.Analyzer;
 import databaseauditor.Database.Init;
-import databaseauditor.Model.Instances;
 
 public class WorkBench {
+    Utilities utils = new Utilities();
+
     void init() {
         Init init = new Init();
         try {
-            Instances instances = new Instances();
-            init.postgreSQL(instances.data);
+            List<Object> objs = utils.getInstances();
+            init.postgreSQL(objs);
+            init.mongoDB(objs);
+            // Analyzer analyzer = new Analyzer();
+            // analyzer.create(objs, 200);
+            // analyzer.update(objs, 200);
+            // analyzer.delete(objs, 200);
+            // analyzer.read(objs, 200);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         
         // init.mongoDB(instances.data);
-        // Analyzer analyzer = new Analyzer();
-        // analyzer.create(instances.data, 200);
-        // analyzer.update(instances.data, 200);
-        // analyzer.delete(instances.data, 200);
-        // analyzer.read(instances.data, 200);
     }
 }

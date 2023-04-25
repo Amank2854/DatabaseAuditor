@@ -20,21 +20,21 @@ import java.util.*;
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4j implements Database {
-    Driver driver = null;
+    Session session = null;
 
     @Override
     public boolean connect(String url, String username, String password) throws Exception {
-        if (driver != null) {
+        if (session != null) {
             return true;
         }
 
-        driver = GraphDatabase.driver(url, AuthTokens.basic(username, password));
+        session = GraphDatabase.driver(url, AuthTokens.basic(username, password)).session();
         return true;
     }
 
     @Override
     public void disconnect() throws Exception {
-        driver.close();
+        session = null;
     }
 
     public <T> int insertOne(T obj) throws Exception {
@@ -57,7 +57,8 @@ public class Neo4j implements Database {
         }
 
         query = query + "});";
-        session.writeTransaction(tx -> tx.run(query));
+        final String finalQuery = query;
+        session.writeTransaction(tx -> tx.run(finalQuery));
         return 1;
     }
 
@@ -89,7 +90,8 @@ public class Neo4j implements Database {
         String query = "MATCH (n:"
                 + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {"
                 + conditions + "}) " + " set " + updates + ";";
-        Result result = session.writeTransaction(tx -> tx.run(query));
+        final String finalQuery = query;
+        Result result = session.writeTransaction(tx -> tx.run(finalQuery));
         int nodesUpdated = (result.consume().counters().propertiesSet()) / noOfFields;
         return nodesUpdated;
     }
@@ -118,7 +120,8 @@ public class Neo4j implements Database {
         String query = "MATCH (n:"
                 + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {"
                 + conditions + "}) " + " delete n;";
-        Result resultSummary = session.writeTransaction(tx -> tx.run(query));
+        final String finalQuery = query;
+        Result resultSummary = session.writeTransaction(tx -> tx.run(finalQuery));
         SummaryCounters counters = resultSummary.consume().counters();
         return counters.nodesDeleted();
     }
@@ -156,7 +159,8 @@ public class Neo4j implements Database {
         String query = "MATCH (n:"
                 + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {"
                 + conditions + "}) " + " return " + columns + ";";
-        Result result = session.run(query);
+        final String finalQuery = query;
+        Result result = session.run(finalQuery);
         int count = 0;
         while (result.hasNext()) {
             Record record = result.next();
