@@ -8,4 +8,4 @@ build
 bin
 
 # Ignore environment variables
-.env
+# .env
