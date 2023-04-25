@@ -5,8 +5,14 @@ import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.summary.ResultSummary;
+import org.neo4j.driver.summary.SummaryCounters;
 
 import java.lang.reflect.Field;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -77,6 +83,7 @@ public class Neo4j implements Database {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
         String updates = "", conditions = "";
+        int noOfFields = fields.length;
 
         for (Field field : fields) {
             try {
@@ -101,15 +108,14 @@ public class Neo4j implements Database {
                 return -1;
             }
         }
-
         updates = updates.substring(0, updates.length() - 2);
         conditions = conditions.substring(0, conditions.length() - 2);
         String query = "MATCH (n:" + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {" + conditions + "}) " + " set " + updates + ";";
         try (Session session = driver.session()) {
             String finalQuery = query;
-            session.writeTransaction(tx -> tx.run(finalQuery));
-            // TODO: return number of updates
-            return 1;
+            Result result = session.writeTransaction(tx -> tx.run(finalQuery));
+            int nodesUpdated = (result.consume().counters().propertiesSet())/noOfFields;
+            return nodesUpdated;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return -1;
@@ -145,9 +151,9 @@ public class Neo4j implements Database {
         String query = "MATCH (n:" + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {" + conditions + "}) " + " delete n;";
         try (Session session = driver.session()) {
             String finalQuery = query;
-            session.writeTransaction(tx -> tx.run(finalQuery));
-            // TODO: return number of deletes
-            return 1;
+            Result resultSummary = session.writeTransaction(tx -> tx.run(finalQuery));
+            SummaryCounters counters = resultSummary.consume().counters();
+            return counters.nodesDeleted();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return -1;
@@ -155,6 +161,54 @@ public class Neo4j implements Database {
     }
 
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols){
-        return 1;
+        Field[] fields = obj.getClass().getDeclaredFields();
+        List<String> fieldNames = new ArrayList<String>();
+        String columns = "", conditions = "";
+
+        for (Field field : fields) {
+            try {
+                fieldNames.add(field.getName().toString());
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+                return -1;
+            }
+        }
+
+        for (List<String> param : params) {
+            if (fieldNames.contains(param.get(0))) {
+                conditions = conditions + " " + param.get(0) + " : ";
+                conditions = conditions + "\"" + param.get(1) + "\", ";
+            } else {
+                System.out.println("INVALID PARAMETER: " + param.get(0));
+                return -1;
+            }
+        }
+
+        for (String reqCol : reqCols) {
+            if (fieldNames.contains(reqCol)) {
+                columns = columns + "n."+reqCol + ", ";
+            } else {
+                System.out.println("INVALID COLUMN: " + reqCol);
+                return -1;
+            }
+        }
+
+        columns = columns.substring(0, columns.length() - 2);
+        conditions = conditions.substring(0, conditions.length() - 2);
+
+        String query = "MATCH (n:" + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {" + conditions + "}) " + " return " + columns + ";";
+        try (Session session = driver.session()) {
+            String finalQuery = query;
+            Result result = session.run(finalQuery);
+            int count = 0;
+            while (result.hasNext()) {
+                Record record = result.next();
+                count++;
+            }
+            return count;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return -1;
+        }
     }
 }
