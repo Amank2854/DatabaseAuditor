@@ -42,7 +42,7 @@ public class Analyzer {
             entityType.add(entities.get(i).getClass().getSimpleName());
         }
 
-        System.out.println("Creating " + numIterations + " record(s) in each database for the following possible entitie(s):\n" + entityType);
+        System.out.println("Creating " + numIterations + " record(s) in each database for the following possible entities:\n" + entityType);
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
         long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
         long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
@@ -86,7 +86,7 @@ public class Analyzer {
             entityType.add(entities.get(i).getClass().getSimpleName());
         }
 
-        System.out.println("Updating " + numIterations + " record(s) in each database for the following possible entitie(s):\n" + entityType);
+        System.out.println("Updating " + numIterations + " record(s) in each database for the following possible entities:\n" + entityType);
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
         long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
         long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
@@ -135,7 +135,7 @@ public class Analyzer {
             entityType.add(entities.get(i).getClass().getSimpleName());
         }
 
-        System.out.println("Deleting " + numIterations + " record(s) from each database for the following possible entitie(s):\n" + entityType);
+        System.out.println("Deleting " + numIterations + " record(s) from each database for the following possible entities:\n" + entityType);
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
         long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
         long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
@@ -179,7 +179,7 @@ public class Analyzer {
             entityType.add(entities.get(i).getClass().getSimpleName());
         }
 
-        System.out.println("Reading " + numIterations + " record(s) from each database for the following possible entitie(s):\n" + entityType);
+        System.out.println("Reading " + numIterations + " record(s) from each database for the following possible entities:\n" + entityType);
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
         long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
         long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
@@ -223,6 +223,7 @@ public class Analyzer {
     public void query(int numIterations) throws Exception {
         PostgresAnalyzer postgresAnalyzer = new PostgresAnalyzer();
 
+        System.out.println("Executing " + numIterations + " specific queries for each database");
         long[] idx = new long[numIterations];
         long[] queryTypes = new long[numIterations];
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
@@ -246,10 +247,12 @@ public class Analyzer {
         List<String> labels = Arrays.asList("PostgreSQL");
         List<long[]> times = Arrays.asList(postgresTimes);
         LineChart.plot(idx, times, labels, "Number Of Insertions", "Time (ns)",
-                "Execution Time", outputDir + "insert_times.png");
+                "Execution Time", outputDir + "specific_query_times.png");
 
         List<long[]> memory = Arrays.asList(postgresMemory);
         LineChart.plot(idx, memory, labels, "Number Of Insertions", "Memory (bytes)",
-                "Memory Consumption", outputDir + "insert_memory.png");
+                "Memory Consumption", outputDir + "specific_query_memory.png");
+
+        System.out.println(ANSI_GREEN + "Specific query operation(s) complete\n" + ANSI_RESET);
     }
 }
