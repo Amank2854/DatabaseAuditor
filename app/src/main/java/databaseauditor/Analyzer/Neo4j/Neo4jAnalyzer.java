@@ -1,3 +1,4 @@
+package databaseauditor.Analyzer.Neo4j;
 // package databaseauditor.Analyzer;
 
 // import org.neo4j.driver.AuthTokens;

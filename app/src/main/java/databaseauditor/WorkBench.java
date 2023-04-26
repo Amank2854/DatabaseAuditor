@@ -3,28 +3,25 @@ package databaseauditor;
 import java.util.List;
 
 import databaseauditor.Analyzer.Analyzer;
-import databaseauditor.Analyzer.PostgresSpecific;
-import databaseauditor.Database.Init;
+import databaseauditor.Database.Builder;
 
 public class WorkBench {
     Utilities utils = new Utilities();
 
     void init() {
-        Init init = new Init();
+        Builder builder = new Builder();
         try {
-            List<Object> objs = utils.getInstances();
-            init.postgreSQL(objs);
-            init.mongoDB(objs);
-            init.neo4j(objs);
-            // Analyzer analyzer = new Analyzer();
-            // analyzer.create(objs, 200);
-            // analyzer.read(objs, 200);
-            // analyzer.update(objs, 200);
-            // analyzer.delete(objs, 200);
+            List<Object> objs = utils.getModels();
+            builder.init(objs);
 
-            PostgresSpecific ps = new PostgresSpecific();
-            ps.analyze(1);
+            Analyzer analyzer = new Analyzer();
+            analyzer.create(objs, 10000);
+            analyzer.read(objs, 200);
+            analyzer.update(objs, 200);
+            analyzer.delete(objs, 200);
+            analyzer.query(1000);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
     }

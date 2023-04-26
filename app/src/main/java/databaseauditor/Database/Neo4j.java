@@ -1,20 +1,14 @@
 package databaseauditor.Database;
 
-import databaseauditor.Database.Database;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.summary.ResultSummary;
 import org.neo4j.driver.summary.SummaryCounters;
+import org.neo4j.driver.*;
 
 import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.neo4j.driver.Values.parameters;
@@ -23,50 +17,49 @@ public class Neo4j implements Database {
     Session session = null;
 
     @Override
-    public boolean connect(String url, String username, String password) throws Exception {
+    // Method to connect to the neo4j database
+    public void connect(String url, String username, String password) throws Exception {
         if (session != null) {
-            return true;
+            return;
         }
 
         session = GraphDatabase.driver(url, AuthTokens.basic(username, password)).session();
-        return true;
     }
 
     @Override
+    // Method to disconnect from the neo4j database
     public void disconnect() throws Exception {
         session = null;
     }
 
+    // Method to insert one record into the neo4j database
     public <T> int insertOne(T obj) throws Exception {
-        try {
-            Field[] fields = obj.getClass().getDeclaredFields();
-            List<String> propertyKey = new ArrayList<>();
-            List<Object> propertyValue = new ArrayList<>();
-    
-            for (Field field : fields) {
-                propertyKey.add(field.getName().toString());
-                propertyValue.add(field.get(obj).toString());
-            }
-    
-            String query = "CREATE (n:"
-                    + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {";
-            for (int i = 0; i < propertyKey.size(); i++) {
-                query = query + propertyKey.get(i) + ": \"" + propertyValue.get(i).toString() + "\"";
-                if (i != propertyKey.size() - 1) {
-                    query = query + ", ";
-                }
-            }
-    
-            query = query + "});";
-            final String finalQuery = query;
-            session.writeTransaction(tx -> tx.run(finalQuery));
-        } catch (Exception e) {
-            e.printStackTrace();
+        Field[] fields = obj.getClass().getDeclaredFields();
+        List<String> propertyKey = new ArrayList<>();
+        List<Object> propertyValue = new ArrayList<>();
+
+        for (Field field : fields) {
+            propertyKey.add(field.getName().toString());
+            propertyValue.add(field.get(obj).toString());
         }
+
+        String query = "CREATE (n:"
+                + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {";
+        for (int i = 0; i < propertyKey.size(); i++) {
+            query = query + propertyKey.get(i) + ": \"" + propertyValue.get(i).toString() + "\"";
+            if (i != propertyKey.size() - 1) {
+                query = query + ", ";
+            }
+        }
+
+        query = query + "});";
+        final String finalQuery = query;
+        session.writeTransaction(tx -> tx.run(finalQuery));
         return 1;
     }
 
     @Override
+    // Method to update many records in the neo4j database
     public <T> int updateMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
@@ -100,6 +93,7 @@ public class Neo4j implements Database {
     }
 
     @Override
+    // Method to delete many records from the neo4j database
     public <T> int deleteMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
@@ -128,6 +122,7 @@ public class Neo4j implements Database {
         return counters.nodesDeleted();
     }
 
+    // Method to select many records from the neo4j database
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
@@ -161,6 +156,7 @@ public class Neo4j implements Database {
                 + conditions + "}) " + " return " + columns + ";";
         final String finalQuery = query;
         Result result = session.run(finalQuery);
+
         int count = 0;
         while (result.hasNext()) {
             Record record = result.next();

@@ -10,26 +10,28 @@ import java.util.List;
 
 import databaseauditor.Utilities;
 
-public class PostgreSQL implements Database {
+public class Postgres implements Database {
     Connection conn = null;
     Utilities util = new Utilities();
 
     @Override
-    public boolean connect(String url, String username, String password) throws Exception {
+    // Method to connect to the postgres database
+    public void connect(String url, String username, String password) throws Exception {
         if (this.conn != null) {
-            return true;
+            return;
         }
 
         this.conn = DriverManager.getConnection(url, username, password);
-        return true;
     }
 
     @Override
+    // Method to disconnect from the postgres database
     public void disconnect() throws Exception {
         this.conn.close();
     }
 
     @Override
+    // Method to insert one record into the postgres database
     public <T> int insertOne(T obj) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         String columns = "(", values = "(";
@@ -52,6 +54,7 @@ public class PostgreSQL implements Database {
     }
 
     @Override
+    // Method to update many records in the postgres database
     public <T> int updateMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
@@ -68,7 +71,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                throw new Exception("Invalid parameter: " + param.get(0));
+                throw new Exception("\nSomething went wrong: Invalid parameter " + param.get(0) + "\n");
             }
         }
 
@@ -84,6 +87,7 @@ public class PostgreSQL implements Database {
     }
 
     @Override
+    // Method to delete many records from the postgres database
     public <T> int deleteMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
@@ -98,7 +102,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                throw new Exception("Invalid parameter: " + param.get(0));
+                throw new Exception("\nSomething went wrong: Invalid parameter " + param.get(0) + "\n");
             }
         }
 
@@ -113,6 +117,7 @@ public class PostgreSQL implements Database {
     }
 
     @Override
+    // Method to select many records from the postgres database
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
@@ -132,7 +137,7 @@ public class PostgreSQL implements Database {
                 conditions = conditions + " " + param.get(0) + " = ";
                 conditions = conditions + "'" + param.get(1) + "' and";
             } else {
-                throw new Exception("Invalid parameter: " + param.get(0));
+                throw new Exception("\nSomething went wrong: Invalid parameter " + param.get(0) + "\n");
             }
         }
 
@@ -140,7 +145,7 @@ public class PostgreSQL implements Database {
             if (fieldNames.contains(reqCol)) {
                 columns = columns + reqCol + ", ";
             } else {
-                throw new Exception("Invalid parameter: " + reqCol);
+                throw new Exception("\nSomething went wrong: Invalid parameter " + reqCol + "\n");
             }
         }
 

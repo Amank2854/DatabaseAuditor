@@ -1,25 +1,24 @@
 package databaseauditor.Database;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 
 import com.mongodb.client.model.Updates;
-import io.github.cdimascio.dotenv.Dotenv;
-
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.UpdateResult;
+import org.bson.conversions.Bson;
+import org.bson.Document;
 
 import databaseauditor.Utilities;
-
-import org.bson.Document;
-import org.bson.conversions.Bson;
 
 import static com.mongodb.client.model.Filters.*;
 
@@ -28,23 +27,25 @@ public class MongoDB implements Database {
     Utilities util = new Utilities();
 
     @Override
-    public boolean connect(String url, String username, String password) throws Exception {
+    // Method to connect to the mongodb database
+    public void connect(String url, String username, String password) throws Exception {
         if (this.database != null) {
-            return true;
+            return;
         }
 
         Dotenv dotenv = Dotenv.load();
         MongoClient mongo = new MongoClient(new MongoClientURI(url));
         this.database = mongo.getDatabase(dotenv.get("DB_NAME"));
-        return true;
     }
 
     @Override
+    // Method to disconnect from the mongodb database
     public void disconnect() {
         this.database = null;
     }
 
     @Override
+    // Method to insert one record into the mongodb database
     public <T> int insertOne(T obj) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(
@@ -60,6 +61,7 @@ public class MongoDB implements Database {
     }
 
     @Override
+    // Method to update many records in the mongodb database
     public <T> int updateMany(T obj, List<List<String>> params) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
@@ -83,7 +85,7 @@ public class MongoDB implements Database {
                 }
 
             } else {
-                throw new Exception("Invalid parameter: " + param.get(0));
+                throw new Exception("\nSomething went wrong: Invalid parameter " + param.get(0) + "\n");
             }
         }
 
@@ -92,6 +94,7 @@ public class MongoDB implements Database {
     }
 
     @Override
+    // Method to delete many records from the mongodb database
     public <T> int deleteMany(T obj, List<List<String>> params) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
@@ -112,7 +115,7 @@ public class MongoDB implements Database {
                 }
 
             } else {
-                throw new Exception("Invalid parameter: " + param.get(0));
+                throw new Exception("\nSomething went wrong: Invalid parameter " + param.get(0) + "\n");
             }
         }
 
@@ -121,6 +124,7 @@ public class MongoDB implements Database {
     }
 
     @Override
+    // Method to select many records from the mongodb database
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
@@ -142,7 +146,7 @@ public class MongoDB implements Database {
                 }
 
             } else {
-                throw new Exception("Invalid parameter: " + param.get(0));
+                throw new Exception("\nSomething went wrong: Invalid parameter " + param.get(0) + "\n");
             }
         }
 
@@ -151,7 +155,7 @@ public class MongoDB implements Database {
             if (fieldNames.contains(col)) {
                 projection.append(col, 1);
             } else {
-                throw new Exception("Invalid parameter: " + col);
+                throw new Exception("\nSomething went wrong: Invalid parameter " + col + "\n");
             }
         }
 

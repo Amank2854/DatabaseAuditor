@@ -7,10 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Utilities {
+    // Method to convert camel case to snake case
     public String camelToSnakeCase(String camelCase) {
         return camelCase.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }
 
+    // Method to calculate the execution time of a method
     public <T> long getElapsedTime(T obj, String methodName, Object[] params, boolean log) throws Exception {
         Class<?> clazz = obj.getClass();
         Method methlist[] = clazz.getDeclaredMethods();
@@ -39,9 +41,10 @@ public class Utilities {
             }
         }
 
-        throw new Exception("Something went wrong");
+        throw new Exception("ERROR: Execution time could not be calculated");
     }
 
+    // Method to calculate the consumed memory by a method
     public <T> long getConsumedMemory(T obj, String methodName, Object[] params, boolean log) throws Exception {
         Class<?> clazz = obj.getClass();
         Method methlist[] = clazz.getDeclaredMethods();
@@ -69,9 +72,10 @@ public class Utilities {
             }
         }
 
-        throw new Exception("Something went wrong");
+        throw new Exception("ERROR: Consumed memory could not be calculated");
     }
 
+    // Method to instantiate a class
     public Object instantiate(String className) throws Exception {
         Class<?> clazz = Class.forName(className);
         Constructor<?> ctor = clazz.getConstructors()[0];
@@ -79,17 +83,20 @@ public class Utilities {
         int numParam = ctor.getParameterCount();
         Object[] args = new Object[numParam];
         for (int i = 0; i < numParam; i++) {
-            args[i] = "TEST";
+            args[i] = "1";
         }
 
         return ctor.newInstance(args);
     }
 
-    public List<Object> getInstances() throws Exception {
-        List<Object> data = new ArrayList<Object>();
+    // Method to get all instances of the model classes
+    public List<Object> getModels() throws Exception {
+        // TODO: Get all classes from the Model package instead
         List<String> classes = Arrays.asList("Actor", "Address", "Category", "City", "Country", "Customer", "Film",
                 "FilmActor", "FilmCategory", "Inventory", "Language", "Payment", "Rental", "Staff",
                 "Store");
+
+        List<Object> data = new ArrayList<Object>();
         for (String className : classes) {
             data.add(instantiate("databaseauditor.Model." + className));
         }

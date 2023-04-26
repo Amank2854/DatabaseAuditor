@@ -1,3 +1,4 @@
+package databaseauditor.Analyzer.MongoDB;
 // package databaseauditor.Analyzer;
 
 // import com.mongodb.MongoClient;

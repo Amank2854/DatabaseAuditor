@@ -1,5 +1,7 @@
 package databaseauditor.Database;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,20 +12,33 @@ import java.util.logging.Logger;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.*;
 
 import databaseauditor.Utilities;
-import io.github.cdimascio.dotenv.Dotenv;
 
-public class Init {
+public class Builder {
+    static final String ANSI_GREEN = "\u001B[32m";
+    static final String ANSI_RESET = "\u001B[0m";
+
     Dotenv dotenv = Dotenv.load();
     Utilities utils = new Utilities();
     String db_name = this.dotenv.get("DB_NAME");
 
-    public void postgreSQL(List<Object> tables) throws Exception {
+    // Method to initialize all the databases
+    public void init(List<Object> objs) throws Exception {
+        this.postgres(objs);
+        this.mongoDB(objs);
+        this.neo4j(objs);
+        
+        System.out.println(ANSI_GREEN + "Database setup complete\n" + ANSI_RESET);
+    }
+
+    // Method to intialize the postgres database
+    public void postgres(List<Object> tables) throws Exception {
         String url = this.dotenv.get("POSTGRES_URL") + "postgres";
         String username = this.dotenv.get("POSTGRES_USER");
         String password = this.dotenv.get("POSTGRES_PASSWORD");
@@ -50,15 +65,16 @@ public class Init {
             conn.createStatement().execute(sql);
         }
 
-        PostgreSQL postgres = new PostgreSQL();
+        Postgres postgres = new Postgres();
         postgres.connect(url, username, password);
         for (Object table : tables) {
             postgres.insertOne(table);
         }
 
-        System.out.println("PostgreSQL database created successfully");
+        System.out.println(ANSI_GREEN + "PostgreSQL database initialized successfully" + ANSI_RESET);
     }
 
+    // Method to initialize the mongodb database
     public void mongoDB(List<Object> tables) throws Exception {
         Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
         mongoLogger.setLevel(Level.SEVERE);
@@ -82,9 +98,10 @@ public class Init {
             mongodb.insertOne(table);
         }
 
-        System.out.println("MongoDB database created successfully");
+        System.out.println(ANSI_GREEN + "MongoDB database initialized successfully" + ANSI_RESET);
     }
 
+    // Method to initialize the neo4j database
     public void neo4j(List<Object> nodes) throws Exception {
         String url = this.dotenv.get("NEO4J_URL");
         String username = this.dotenv.get("NEO4J_USER");
@@ -100,6 +117,6 @@ public class Init {
             neo.insertOne(node);
         }
 
-        System.out.println("Neo4j database created successfully");
+        System.out.println(ANSI_GREEN + "Neo4j database initialized successfully" + ANSI_RESET);
     }
 }
