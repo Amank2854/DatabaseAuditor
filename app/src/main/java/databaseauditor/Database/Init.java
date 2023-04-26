@@ -10,10 +10,10 @@ import java.util.logging.Logger;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import org.neo4j.driver.*;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.*;
 
 import databaseauditor.Utilities;
 import io.github.cdimascio.dotenv.Dotenv;

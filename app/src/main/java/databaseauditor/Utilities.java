@@ -14,7 +14,7 @@ public class Utilities {
     public <T> long getElapsedTime(T obj, String methodName, Object[] params, boolean log) throws Exception {
         Class<?> clazz = obj.getClass();
         Method methlist[] = clazz.getDeclaredMethods();
-        
+
         for (int i = 0; i < methlist.length; i++) {
             if (methlist[i].getName().equals(methodName)) {
                 Class<?> pvec[] = methlist[i].getParameterTypes();
@@ -75,19 +75,21 @@ public class Utilities {
     public Object instantiate(String className) throws Exception {
         Class<?> clazz = Class.forName(className);
         Constructor<?> ctor = clazz.getConstructors()[0];
-        
+
         int numParam = ctor.getParameterCount();
         Object[] args = new Object[numParam];
-        for (int i=0;i<numParam;i++) {
+        for (int i = 0; i < numParam; i++) {
             args[i] = "TEST";
         }
-        
+
         return ctor.newInstance(args);
     }
 
     public List<Object> getInstances() throws Exception {
         List<Object> data = new ArrayList<Object>();
-        List<String> classes = Arrays.asList("Actor", "Address");
+        List<String> classes = Arrays.asList("Actor", "Address", "Category", "City", "Country", "Customer", "Film",
+                "FilmActor", "FilmCategory", "Inventory", "Language", "Payment", "Rental", "Staff",
+                "Store");
         for (String className : classes) {
             data.add(instantiate("databaseauditor.Model." + className));
         }
