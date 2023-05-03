@@ -51,15 +51,6 @@ FROM rental
 GROUP BY customer.customer_id, store.store_id
 ORDER BY total_revenue DESC;
 
--- Average Rental Duration by Each Film Category
-SELECT category.category_id, AVG(rental.return_date::DOUBLE PRECISION - rental.rental_date::DOUBLE PRECISION) AS avg_rental_duration
-FROM category
-        INNER JOIN film_category ON category.category_id = film_category.category_id
-        INNER JOIN inventory ON film_category.film_id = inventory.film_id
-        INNER JOIN rental ON inventory.inventory_id = rental.inventory_id
-GROUP BY category.category_id
-ORDER BY avg_rental_duration DESC;
-
 -- Number of Rentals Per Film Category and Language
 SELECT f.rating, f.language_id, COUNT(*) AS num_rentals
 FROM film f
@@ -194,7 +185,6 @@ ORDER BY
     total_revenue DESC
 LIMIT 5;
 
-
 -- customers who have rented the most number of films in each city
 SELECT
     c.customer_id,
@@ -209,65 +199,3 @@ GROUP BY
     c.customer_id, ci.city_id
 ORDER BY
     num_rentals DESC;
-
--- films that have been rented for the most number of times in each category
-SELECT category.name, film.title, rental_count
-FROM (
-        SELECT film.film_id, COUNT(*) AS rental_count
-        FROM rental
-                JOIN inventory ON rental.inventory_id = inventory.inventory_id
-                JOIN film ON inventory.film_id = film.film_id
-        GROUP BY film.film_id
-     ) AS rental_counts
-        JOIN film_category ON rental_counts.film_id = film_category.film_id
-        JOIN category ON film_category.category_id = category.category_id
-        JOIN film ON rental_counts.film_id = film.film_id
-        JOIN (
-    SELECT category_id, MAX(rental_count::INTEGER) AS max_rental_count
-    FROM (
-            SELECT film.film_id, COUNT(*) AS rental_count
-            FROM rental
-                    JOIN inventory ON rental.inventory_id = inventory.inventory_id
-                    JOIN film ON inventory.film_id = film.film_id
-            GROUP BY film.film_id
-         ) AS rental_counts
-            JOIN film_category ON rental_counts.film_id = film_category.film_id
-    GROUP BY category_id
-) AS max_rental_counts
-            ON category.category_id = max_rental_counts.category_id
-                AND rental_count = max_rental_counts.max_rental_count
-ORDER BY category.name;
-
-
--- Update Queries
-
---Set the replacement_cost to 0 for all DVDs that have been rented more than 20 times
-
-UPDATE film SET replacement_cost = 0 WHERE film_id IN (
-    SELECT inventory.film_id
-    FROM inventory
-        JOIN rental ON inventory.inventory_id = rental.inventory_id
-    GROUP BY inventory.film_id
-    HAVING COUNT(*) > 20
-);
-
--- Increase rental rate of all Films released in 2006 by 50%
--- UPDATE film
--- SET rental_rate = rental_rate * 1.5
--- WHERE release_year = '2006';
-
-
--- -- Update rental rate equal to the average rental rate of all films in the same category
--- UPDATE film
--- SET rental_rate = (
---         SELECT AVG(rental_rate::INTEGER)
---         FROM film
---             INNER JOIN film_category
---                 ON film.film_id = film_category.film_id
---         WHERE film_category.category_id
---                   IN (SELECT category_id
---                       FROM film_category
---                       WHERE film_id = film.film_id))
--- WHERE EXISTS (SELECT *
---               FROM film_category
---               WHERE film_category.film_id = film.film_id);

@@ -9,6 +9,8 @@ import java.util.List;
 
 import databaseauditor.LineChart;
 import databaseauditor.Utilities;
+import databaseauditor.Analyzer.MongoDB.MongoDBAnalyzer;
+import databaseauditor.Analyzer.Neo4j.Neo4jAnalyzer;
 import databaseauditor.Analyzer.Postgres.PostgresAnalyzer;
 import databaseauditor.Database.MongoDB;
 import databaseauditor.Database.Neo4j;
@@ -29,20 +31,23 @@ public class Analyzer {
 
     // Constructor to initialize the connections
     public Analyzer() throws Exception {
-        postgres.connect(this.dotenv.get("POSTGRES_URL") + this.dotenv.get("DB_NAME"), this.dotenv.get("POSTGRES_USER"),
+        postgres.connect(this.dotenv.get("POSTGRES_URL") + this.dotenv.get("DB_NAME"),
+                this.dotenv.get("POSTGRES_USER"),
                 this.dotenv.get("POSTGRES_PASSWORD"));
         mongo.connect(this.dotenv.get("MONGODB_URI"), "", "");
-        neo.connect(this.dotenv.get("NEO4J_URL"), this.dotenv.get("NEO4J_USER"), this.dotenv.get("NEO4J_PASSWORD"));
+        neo.connect(this.dotenv.get("NEO4J_URL"), this.dotenv.get("NEO4J_USER"),
+                this.dotenv.get("NEO4J_PASSWORD"));
     }
 
     // Method to analyze the create operations for all the databases
     public void create(List<Object> entities, int numIterations) throws Exception {
         List<String> entityType = new ArrayList<String>();
-        for (int i =0 ;i<entities.size();i++){
+        for (int i = 0; i < entities.size(); i++) {
             entityType.add(entities.get(i).getClass().getSimpleName());
         }
 
-        System.out.println("Creating " + numIterations + " record(s) in each database for the following possible entities:\n" + entityType);
+        System.out.println("Creating " + numIterations
+                + " record(s) in each database for the following possible entities:\n" + entityType);
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
         long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
         long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
@@ -76,17 +81,21 @@ public class Analyzer {
         LineChart.plot(idx, memory, labels, "Number Of Basic Insertions", "Memory (bytes)",
                 "Memory Consumption", outputDir + "basic_insert_memory.png");
 
+        utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
+                numIterations,
+                "basic_insert", entityType);
         System.out.println(ANSI_GREEN + "Creation operation(s) complete\n" + ANSI_RESET);
     }
 
     // Method to analyze the update operations for all the databases
     public void update(List<Object> entities, int numIterations) throws Exception {
         List<String> entityType = new ArrayList<String>();
-        for (int i =0 ;i<entities.size();i++){
+        for (int i = 0; i < entities.size(); i++) {
             entityType.add(entities.get(i).getClass().getSimpleName());
         }
 
-        System.out.println("Updating " + numIterations + " record(s) in each database for the following possible entities:\n" + entityType);
+        System.out.println("Updating " + numIterations
+                + " record(s) in each database for the following possible entities:\n" + entityType);
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
         long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
         long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
@@ -104,7 +113,8 @@ public class Analyzer {
 
             List<List<String>> conditions = new ArrayList<List<String>>();
             conditions.add(Arrays.asList(fields[0].getName().toString(),
-                    Integer.toString((int) Math.floor(Math.random() * (maxNum - minNum + 1) + minNum))));
+                    Integer.toString((int) Math
+                            .floor(Math.random() * (maxNum - minNum + 1) + minNum))));
 
             Object[] args = { entity, conditions };
             postgresTimes[i] = this.utils.getElapsedTime(postgres, "updateMany", args, false);
@@ -125,17 +135,21 @@ public class Analyzer {
         LineChart.plot(idx, memory, labels, "Number Of Basic Updates", "Memory (bytes)",
                 "Memory Consumption", outputDir + "basic_update_memory.png");
 
+        utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
+                numIterations,
+                "basic_update", entityType);
         System.out.println(ANSI_GREEN + "Update operation(s) complete\n" + ANSI_RESET);
     }
 
     // Method to analyze the delete operations for all the databases
     public void delete(List<Object> entities, int numIterations) throws Exception {
         List<String> entityType = new ArrayList<String>();
-        for (int i =0 ;i<entities.size();i++){
+        for (int i = 0; i < entities.size(); i++) {
             entityType.add(entities.get(i).getClass().getSimpleName());
         }
 
-        System.out.println("Deleting " + numIterations + " record(s) from each database for the following possible entities:\n" + entityType);
+        System.out.println("Deleting " + numIterations
+                + " record(s) from each database for the following possible entities:\n" + entityType);
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
         long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
         long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
@@ -148,7 +162,8 @@ public class Analyzer {
 
             List<List<String>> conditions = new ArrayList<List<String>>();
             conditions.add(Arrays.asList(fields[0].getName().toString(),
-                    Integer.toString((int) Math.floor(Math.random() * (maxNum - minNum + 1) + minNum))));
+                    Integer.toString((int) Math
+                            .floor(Math.random() * (maxNum - minNum + 1) + minNum))));
 
             Object[] args = { entity, conditions };
             postgresTimes[i] = this.utils.getElapsedTime(postgres, "deleteMany", args, false);
@@ -169,17 +184,21 @@ public class Analyzer {
         LineChart.plot(idx, memory, labels, "Number Of Basic Deletes", "Memory (bytes)",
                 "Memory Consumption", outputDir + "basic_delete_memory.png");
 
+        utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
+                numIterations,
+                "basic_delete", entityType);
         System.out.println(ANSI_GREEN + "Delete operation(s) complete\n" + ANSI_RESET);
     }
 
     // Method to analyze the read operations for all the databases
     public void read(List<Object> entities, int numIterations) throws Exception {
         List<String> entityType = new ArrayList<String>();
-        for (int i =0 ;i<entities.size();i++){
+        for (int i = 0; i < entities.size(); i++) {
             entityType.add(entities.get(i).getClass().getSimpleName());
         }
 
-        System.out.println("Reading " + numIterations + " record(s) from each database for the following possible entities:\n" + entityType);
+        System.out.println("Reading " + numIterations
+                + " record(s) from each database for the following possible entities:\n" + entityType);
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
         long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
         long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
@@ -192,7 +211,8 @@ public class Analyzer {
 
             List<List<String>> conditions = new ArrayList<List<String>>();
             conditions.add(Arrays.asList(fields[0].getName().toString(),
-                    Integer.toString((int) Math.floor(Math.random() * (maxNum - minNum + 1) + minNum))));
+                    Integer.toString((int) Math
+                            .floor(Math.random() * (maxNum - minNum + 1) + minNum))));
 
             List<String> columns = new ArrayList<String>();
             columns.add(fields[0].getName().toString());
@@ -216,43 +236,59 @@ public class Analyzer {
         LineChart.plot(idx, memory, labels, "Number Of Basic Reads", "Memory (bytes)",
                 "Memory Consumption", outputDir + "basic_read_memory.png");
 
+        utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
+                numIterations,
+                "basic_read", entityType);
         System.out.println(ANSI_GREEN + "Read operation(s) complete\n" + ANSI_RESET);
     }
 
     // Method to analyze specific operations for all the databases
     public void query(int numIterations) throws Exception {
         PostgresAnalyzer postgresAnalyzer = new PostgresAnalyzer();
+        MongoDBAnalyzer mongoDBAnalyzer = new MongoDBAnalyzer();
+        Neo4jAnalyzer neo4jAnalyzer = new Neo4jAnalyzer();
 
         System.out.println("Executing " + numIterations + " specific queries for each database");
         long[] idx = new long[numIterations];
         long[] queryTypes = new long[numIterations];
         long[] postgresTimes = new long[numIterations], postgresMemory = new long[numIterations];
+        long[] mongoTimes = new long[numIterations], mongoMemory = new long[numIterations];
+        long[] neoTimes = new long[numIterations], neoMemory = new long[numIterations];
 
         for (int i = 0; i < numIterations; i++) {
             idx[i] = i;
             List<String> args = new ArrayList<String>();
             int id = (int) Math.floor(Math.random() * postgresAnalyzer.queries.size());
             queryTypes[i] = id;
-            
+
             for (int j = 0; j < postgresAnalyzer.argLens.get(id); j++) {
                 int random_int = (int) Math.floor(Math.random() * (maxNum - minNum + 1) + minNum);
                 args.add(Integer.toString(random_int));
             }
-            
-            Object[] params = {id, args};
+
+            Object[] params = { id, args };
             postgresTimes[i] = utils.getElapsedTime(postgresAnalyzer, "query", params, false);
             postgresMemory[i] = utils.getConsumedMemory(postgresAnalyzer, "query", params, false);
+            mongoTimes[i] = utils.getElapsedTime(mongoDBAnalyzer, "query", params, false);
+            mongoMemory[i] = utils.getConsumedMemory(mongoDBAnalyzer, "query", params, false);
+            // neoTimes[i] = utils.getElapsedTime(neo4jAnalyzer, "query", params, false);
+            // neoMemory[i] = utils.getConsumedMemory(neo4jAnalyzer, "query", params,
+            // false);
         }
 
-        List<String> labels = Arrays.asList("PostgreSQL");
-        List<long[]> times = Arrays.asList(postgresTimes);
+        List<String> labels = Arrays.asList("PostgreSQL", "MongoDB", "Neo4j");
+        List<long[]> times = Arrays.asList(postgresTimes, mongoTimes, neoTimes);
         LineChart.plot(idx, times, labels, "Number Of Insertions", "Time (ns)",
                 "Execution Time", outputDir + "specific_query_times.png");
 
-        List<long[]> memory = Arrays.asList(postgresMemory);
+        List<long[]> memory = Arrays.asList(postgresMemory, mongoMemory, neoMemory);
         LineChart.plot(idx, memory, labels, "Number Of Insertions", "Memory (bytes)",
                 "Memory Consumption", outputDir + "specific_query_memory.png");
 
+        List<String> entityType = new ArrayList<String>();
+        utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
+                numIterations,
+                "specific_query", entityType);
         System.out.println(ANSI_GREEN + "Specific query operation(s) complete\n" + ANSI_RESET);
     }
 }

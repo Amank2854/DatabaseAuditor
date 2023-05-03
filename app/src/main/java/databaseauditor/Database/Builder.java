@@ -2,10 +2,14 @@ package databaseauditor.Database;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,7 +18,6 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 
 import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.*;
 
@@ -34,6 +37,16 @@ public class Builder {
         this.mongoDB(objs);
         this.neo4j(objs);
         
+        Files.deleteIfExists(Paths.get(System.getProperty("user.dir")
+        + "/src/results/results.txt"));
+        File directory = new File(System.getProperty("user.dir")
+        + "/src/charts");
+        for (File file: Objects.requireNonNull(directory.listFiles())) {
+            if (!file.isDirectory()) {
+                file.delete();
+            }
+        }
+
         System.out.println(ANSI_GREEN + "Database setup complete\n" + ANSI_RESET);
     }
 
@@ -80,18 +93,17 @@ public class Builder {
         mongoLogger.setLevel(Level.SEVERE);
         String uri = this.dotenv.get("MONGODB_URI");
 
-        @SuppressWarnings("resource")
-        MongoClient mongo = MongoClients.create(uri);
-        mongo.getDatabase(db_name);
-        MongoDatabase db = mongo.getDatabase(db_name);
-        db.drop();
+        try (MongoClient mongo = MongoClients.create(uri)) {
+            mongo.getDatabase(db_name);
+            MongoDatabase db = mongo.getDatabase(db_name);
+            db.drop();
 
-        db = mongo.getDatabase(db_name);
-        for (Object table : tables) {
-            db.createCollection(this.utils.camelToSnakeCase(
-                    table.getClass().getName().split("\\.")[table.getClass().getName().split("\\.").length - 1]));
+            db = mongo.getDatabase(db_name);
+            for (Object table : tables) {
+                db.createCollection(this.utils.camelToSnakeCase(
+                        table.getClass().getName().split("\\.")[table.getClass().getName().split("\\.").length - 1]));
+            }
         }
-
         MongoDB mongodb = new MongoDB();
         mongodb.connect(uri, uri, uri);
         for (Object table : tables) {

@@ -1,17 +1,12 @@
 package databaseauditor.Database;
 
 import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.Record;
-import org.neo4j.driver.summary.ResultSummary;
 import org.neo4j.driver.summary.SummaryCounters;
 import org.neo4j.driver.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
-
-import static org.neo4j.driver.Values.parameters;
 
 public class Neo4j implements Database {
     Session session = null;
@@ -54,7 +49,7 @@ public class Neo4j implements Database {
 
         query = query + "});";
         final String finalQuery = query;
-        session.writeTransaction(tx -> tx.run(finalQuery));
+        session.executeWrite(tx -> tx.run(finalQuery));
         return 1;
     }
 
@@ -87,7 +82,7 @@ public class Neo4j implements Database {
                 + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {"
                 + conditions + "}) " + " set " + updates + ";";
         final String finalQuery = query;
-        Result result = session.writeTransaction(tx -> tx.run(finalQuery));
+        Result result = session.executeWrite(tx -> tx.run(finalQuery));
         int nodesUpdated = (result.consume().counters().propertiesSet()) / noOfFields;
         return nodesUpdated;
     }
@@ -117,7 +112,7 @@ public class Neo4j implements Database {
                 + obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length - 1] + " {"
                 + conditions + "}) " + " delete n;";
         final String finalQuery = query;
-        Result resultSummary = session.writeTransaction(tx -> tx.run(finalQuery));
+        Result resultSummary = session.executeWrite(tx -> tx.run(finalQuery));
         SummaryCounters counters = resultSummary.consume().counters();
         return counters.nodesDeleted();
     }
@@ -159,7 +154,7 @@ public class Neo4j implements Database {
 
         int count = 0;
         while (result.hasNext()) {
-            Record record = result.next();
+            result.next();
             count++;
         }
         return count;

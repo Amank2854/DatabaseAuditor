@@ -1,0 +1,16 @@
+1000 "basic_insert" for: [Actor, Address, Category, City, Country, Customer, Film, FilmActor, FilmCategory, Inventory, Language, Payment, Rental, Staff, Store]
+Mean execution times: [319750.601, 303653.461, 2102461.41]
+Median execution times: [217060.5, 217060.5, 1816434.5]
+Standard deviation of execution times: [805545.2354357669, 368971.16226568003, 805545.2354357669]
+Mean memory consumption: [8895.344, 9180.184, 33081.928]
+Median memory consumption: [0.0, 0.0, 0.0]
+Standard deviation of memory consumption: [132793.8575314191, 87253.8317418206, 132793.8575314191]
+
+200 "specific_query"
+Mean execution times: [612603.22, 53493.835, 0.0]
+Median execution times: [22708.0, 22708.0, 0.0]
+Standard deviation of execution times: [0.0, 257994.91804163065, 0.0]
+Mean memory consumption: [169481.72, 1709.92, 0.0]
+Median memory consumption: [0.0, 0.0, 0.0]
+Standard deviation of memory consumption: [0.0, 24121.389986350303, 0.0]
+

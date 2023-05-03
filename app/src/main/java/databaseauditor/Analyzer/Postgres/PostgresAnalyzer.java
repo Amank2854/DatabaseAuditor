@@ -17,12 +17,10 @@ import databaseauditor.Utilities;
 public class PostgresAnalyzer {
     public List<String> queries = new ArrayList<String>();
     public List<Integer> argLens = new ArrayList<Integer>();
-    
+
     Dotenv dotenv = Dotenv.load();
     Connection conn = null;
     Utilities utils = new Utilities();
-
-    int max_num = 10000, min_num = 1;;
 
     // Class constructor for reading the specific queries from PostgresQueries.sql
     public PostgresAnalyzer() throws Exception {
