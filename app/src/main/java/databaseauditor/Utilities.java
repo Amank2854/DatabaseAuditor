@@ -1,9 +1,11 @@
 package databaseauditor;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Utilities {
@@ -91,10 +93,18 @@ public class Utilities {
 
     // Method to get all instances of the model classes
     public List<Object> getModels() throws Exception {
-        // TODO: Get all classes from the Model package instead
-        List<String> classes = Arrays.asList("Actor", "Address", "Category", "City", "Country", "Customer", "Film",
-                "FilmActor", "FilmCategory", "Inventory", "Language", "Payment", "Rental", "Staff",
-                "Store");
+        List<String> classes = new ArrayList<String>();
+        File file = new File(
+                System.getProperty("user.dir")
+                        + "/src/main/java/databaseauditor/Model/Models.txt");
+        BufferedReader bfr = new BufferedReader(new FileReader(file));
+
+        String cur = "";
+        while ((cur = bfr.readLine()) != null) {
+            classes.add(cur.substring(1, cur.length() - 2));
+        }
+
+        bfr.close();
 
         List<Object> data = new ArrayList<Object>();
         for (String className : classes) {
@@ -102,5 +112,28 @@ public class Utilities {
         }
 
         return data;
+    }
+
+    // Method to get all relationships between the model classes
+    public List<List<String>> getRelationships() throws Exception {
+        List<List<String>> relationships = new ArrayList<List<String>>();
+        File file = new File(
+            System.getProperty("user.dir")
+                    + "/src/main/java/databaseauditor/Model/Relationships.txt");
+        BufferedReader bfr = new BufferedReader(new FileReader(file));
+
+        String cur = "";
+        while ((cur = bfr.readLine()) != null) {
+            String[] line = cur.substring(0, cur.length() - 1).split(",");
+            List<String> relationship = new ArrayList<String>();
+            for (String word : line) {
+                relationship.add(word.trim().substring(1, word.trim().length() - 1));
+            }
+
+            relationships.add(relationship);
+        }
+
+        bfr.close();
+        return relationships;
     }
 }

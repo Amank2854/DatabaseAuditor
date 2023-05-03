@@ -1,0 +1,3 @@
+"Address", "city_id", "City", "city_id",
+"City", "country_id", "Country", "country_id",
+"Customer", "address_id", "Address", "address_id",
