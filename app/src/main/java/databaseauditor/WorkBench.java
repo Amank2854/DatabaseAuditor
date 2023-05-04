@@ -24,9 +24,9 @@ public class WorkBench {
             analyzer.create(ob1, 10000);
             
             // analyzer.create(ob1, 10000);
-            analyzer.read(ob1, 10000);
-            analyzer.update(ob1, 10000);
-            analyzer.delete(ob1, 10000);
+            analyzer.read(ob1, 1000);
+            analyzer.update(ob1, 1000);
+            analyzer.delete(ob1, 1000);
             
             // analyzer.query(200);
 

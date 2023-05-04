@@ -1,4 +1,6 @@
 "Address", "city_id", "City", "city_id", "is_in",
 Actor->Film
 Film->Category
-""
+"Film","language_id","Language","language_id","has",
+"Inventory","film_id","Film","film_id","contains",
+"Rental","inventory_id","Inventory","inventory_id","rented",
