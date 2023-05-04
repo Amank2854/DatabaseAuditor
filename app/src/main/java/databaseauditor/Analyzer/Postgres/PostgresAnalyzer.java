@@ -22,7 +22,12 @@ public class PostgresAnalyzer {
     Connection conn = null;
     Utilities utils = new Utilities();
 
-    // Class constructor for reading the specific queries from PostgresQueries.sql
+    /**
+     * Constructor for the PostgresAnalyzer class to initalize the connection and
+     * read the queries from the file PostgresQueries.sql
+     * 
+     * @throws Exception if something goes wrong
+     */
     public PostgresAnalyzer() throws Exception {
         this.conn = DriverManager.getConnection(dotenv.get("POSTGRES_URL") + dotenv.get("DB_NAME"),
                 dotenv.get("POSTGRES_USER"),
@@ -54,7 +59,14 @@ public class PostgresAnalyzer {
         bfr.close();
     }
 
-    // Method for executing specific queries in the Postgres database
+    /**
+     * Method to fire the specified query in the Postgres database
+     * 
+     * @param queryNum the query number to fire
+     * @param args     the arguments to pass to the query
+     * @return 1 if the query is successful
+     * @throws Exception if the query fails
+     */
     public int query(int queryNum, List<String> args) throws Exception {
         int id = 0;
         String query = this.queries.get(queryNum), updatedQuery = "";

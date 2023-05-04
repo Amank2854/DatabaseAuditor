@@ -23,7 +23,12 @@ public class Neo4jAnalyzer {
     Session session = null;
     Utilities utils = new Utilities();
 
-    // Class constructor for reading the specific queries from Neo4jQueries.cypher
+    /**
+     * Constructor for the Neo4jAnalyzer class to initalize the connection and read
+     * the queries from the file Neo4jQueries.cypher
+     * 
+     * @throws Exception if something goes wrong
+     */
     public Neo4jAnalyzer() throws Exception {
         session = GraphDatabase.driver(this.dotenv.get("NEO4J_URL"),
                 AuthTokens.basic(this.dotenv.get("NEO4J_USER"), this.dotenv.get("NEO4J_PASSWORD"))).session();
@@ -54,8 +59,15 @@ public class Neo4jAnalyzer {
         bfr.close();
     }
 
-    // Method for executing specific queries in the Neo4j database
-    public int query(int queryNum, List<String> args) {
+    /**
+     * Method to fire the specified query in the Neo4j database
+     * 
+     * @param queryNum the query number to fire
+     * @param args     the arguments to pass to the query
+     * @return 1 if the query is successful
+     * @throws Exception if the query fails
+     */
+    public int query(int queryNum, List<String> args) throws Exception {
         int id = 0;
         String query = this.queries.get(queryNum), updatedQuery = "";
         for (int i = 0; i < query.length(); i++) {
@@ -70,5 +82,19 @@ public class Neo4jAnalyzer {
         final String finalQuery = updatedQuery;
         session.run(finalQuery);
         return 1;
+    }
+
+    /**
+     * Method to create relationships in the Neo4j database
+     * 
+     * @param relationships the relationships to create
+     * @throws Exception if the relationship creation fails
+     */
+    public void createRelationships(List<List<String>> relationships) throws Exception {
+        for (List<String> relationship : relationships) {
+            String query = "MATCH (a:"+relationship.get(0).toLowerCase()+"),(b:"+relationship.get(2).toLowerCase()+") WHERE a."+relationship.get(1)+" = b."+relationship.get(3)+" CREATE (a)-[r:"+relationship.get(4)+"]->(b) RETURN r;";
+            String finalQuery = query;
+            session.executeWrite(tx -> tx.run(finalQuery));
+        }
     }
 }

@@ -31,17 +31,22 @@ public class Builder {
     Utilities utils = new Utilities();
     String db_name = this.dotenv.get("DB_NAME");
 
-    // Method to initialize all the databases
+    /**
+     * Method to initialize all the the databases
+     * 
+     * @param objs list of objects of each model
+     * @throws Exception exception if something went wrong
+     */
     public void init(List<Object> objs) throws Exception {
         this.postgres(objs);
         this.mongoDB(objs);
         this.neo4j(objs);
-        
+
         Files.deleteIfExists(Paths.get(System.getProperty("user.dir")
-        + "/src/results/results.txt"));
+                + "/src/results/results.txt"));
         File directory = new File(System.getProperty("user.dir")
-        + "/src/charts");
-        for (File file: Objects.requireNonNull(directory.listFiles())) {
+                + "/src/charts");
+        for (File file : Objects.requireNonNull(directory.listFiles())) {
             if (!file.isDirectory()) {
                 file.delete();
             }
@@ -50,7 +55,12 @@ public class Builder {
         System.out.println(ANSI_GREEN + "Database setup complete\n" + ANSI_RESET);
     }
 
-    // Method to intialize the postgres database
+    /**
+     * Method to initialize the postgres database
+     * 
+     * @param tables list of objects of each table
+     * @throws Exception exception if something went wrong
+     */
     public void postgres(List<Object> tables) throws Exception {
         String url = this.dotenv.get("POSTGRES_URL") + "postgres";
         String username = this.dotenv.get("POSTGRES_USER");
@@ -84,10 +94,17 @@ public class Builder {
             postgres.insertOne(table);
         }
 
+        conn.close();
+        postgres.disconnect();
         System.out.println(ANSI_GREEN + "PostgreSQL database initialized successfully" + ANSI_RESET);
     }
 
-    // Method to initialize the mongodb database
+    /**
+     * Method to initialize the mongodb database
+     * 
+     * @param tables list of objects of each collection
+     * @throws Exception exception if something went wrong
+     */
     public void mongoDB(List<Object> tables) throws Exception {
         Logger mongoLogger = Logger.getLogger("org.mongodb.driver");
         mongoLogger.setLevel(Level.SEVERE);
@@ -103,17 +120,26 @@ public class Builder {
                 db.createCollection(this.utils.camelToSnakeCase(
                         table.getClass().getName().split("\\.")[table.getClass().getName().split("\\.").length - 1]));
             }
+
+            db = null;
         }
+
         MongoDB mongodb = new MongoDB();
         mongodb.connect(uri, uri, uri);
         for (Object table : tables) {
             mongodb.insertOne(table);
         }
 
+        mongodb.disconnect();
         System.out.println(ANSI_GREEN + "MongoDB database initialized successfully" + ANSI_RESET);
     }
 
-    // Method to initialize the neo4j database
+    /**
+     * Method to initialize the neo4j database
+     * 
+     * @param nodes list of objects of each node
+     * @throws Exception exception if something went wrong
+     */
     public void neo4j(List<Object> nodes) throws Exception {
         String url = this.dotenv.get("NEO4J_URL");
         String username = this.dotenv.get("NEO4J_USER");
@@ -129,6 +155,8 @@ public class Builder {
             neo.insertOne(node);
         }
 
+        session = null;
+        neo.disconnect();
         System.out.println(ANSI_GREEN + "Neo4j database initialized successfully" + ANSI_RESET);
     }
 }

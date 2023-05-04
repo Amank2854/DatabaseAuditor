@@ -29,7 +29,11 @@ public class Analyzer {
     String outputDir = System.getProperty("user.dir") + "/src/charts/";
     int maxNum = 10000, minNum = 1;
 
-    // Constructor to initialize the connections
+    /**
+     * Constructor for the Analyzer class to initialize the database connections
+     * 
+     * @throws Exception exception if something went wrong
+     */
     public Analyzer() throws Exception {
         postgres.connect(this.dotenv.get("POSTGRES_URL") + this.dotenv.get("DB_NAME"),
                 this.dotenv.get("POSTGRES_USER"),
@@ -39,7 +43,26 @@ public class Analyzer {
                 this.dotenv.get("NEO4J_PASSWORD"));
     }
 
-    // Method to analyze the create operations for all the databases
+    public void close() throws Exception {
+        this.postgres.disconnect();
+        this.mongo.disconnect();
+        this.neo.disconnect();
+
+        System.out.println("Analyzer closed successfully");
+    }
+
+    /**
+     * Method to test the basic create operation for each database.
+     * It selects a random entity from the list of entities at each iteration and
+     * inserts a object which is also generated randomly in the selected entity.
+     * This operation is performed for
+     * numIterations times and the time and memory consumed for each iteration is
+     * recorded for all the databases.
+     * 
+     * @param entities      list of entities to create
+     * @param numIterations number of iterations to run
+     * @throws Exception exception if something went wrong
+     */
     public void create(List<Object> entities, int numIterations) throws Exception {
         List<String> entityType = new ArrayList<String>();
         for (int i = 0; i < entities.size(); i++) {
@@ -83,11 +106,22 @@ public class Analyzer {
 
         utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
                 numIterations,
-                "basic_insert", entityType);
+                "basic_insert", entities);
         System.out.println(ANSI_GREEN + "Creation operation(s) complete\n" + ANSI_RESET);
     }
 
-    // Method to analyze the update operations for all the databases
+    /**
+     * Method to test the basic update operation for each database.
+     * It selects a random entity from the list of entities at each iteration and
+     * updates the object with the parameters which are also generated and selected
+     * randomly in the selected entity.
+     * This operation is performed for numIterations times and the time and memory
+     * consumed for each iteration is recorded for all the databases.
+     * 
+     * @param entities      list of entities to update
+     * @param numIterations number of iterations to run
+     * @throws Exception exception if something went wrong
+     */
     public void update(List<Object> entities, int numIterations) throws Exception {
         List<String> entityType = new ArrayList<String>();
         for (int i = 0; i < entities.size(); i++) {
@@ -137,11 +171,22 @@ public class Analyzer {
 
         utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
                 numIterations,
-                "basic_update", entityType);
+                "basic_update", entities);
         System.out.println(ANSI_GREEN + "Update operation(s) complete\n" + ANSI_RESET);
     }
 
-    // Method to analyze the delete operations for all the databases
+    /**
+     * Method to test the basic delete operation for each database.
+     * It selects a random entity from the list of entities at each iteration and
+     * deletes the object with the parameters which are also generated and selected
+     * randomly in the selected entity.
+     * This operation is performed for numIterations times and the time and memory
+     * consumed for each iteration is recorded for all the databases.
+     * 
+     * @param entities      list of entities to delete
+     * @param numIterations number of iterations to run
+     * @throws Exception exception if something went wrong
+     */
     public void delete(List<Object> entities, int numIterations) throws Exception {
         List<String> entityType = new ArrayList<String>();
         for (int i = 0; i < entities.size(); i++) {
@@ -186,11 +231,22 @@ public class Analyzer {
 
         utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
                 numIterations,
-                "basic_delete", entityType);
+                "basic_delete", entities);
         System.out.println(ANSI_GREEN + "Delete operation(s) complete\n" + ANSI_RESET);
     }
 
-    // Method to analyze the read operations for all the databases
+    /**
+     * Method to test the basic read operation for each database.
+     * It selects a random entity from the list of entities at each iteration and
+     * reads the object with the parameters which are also generated and selected
+     * randomly in the selected entity.
+     * This operation is performed for numIterations times and the time and memory
+     * consumed for each iteration is recorded for all the databases.
+     * 
+     * @param entities      list of entities to read
+     * @param numIterations number of iterations to run
+     * @throws Exception exception if something went wrong
+     */
     public void read(List<Object> entities, int numIterations) throws Exception {
         List<String> entityType = new ArrayList<String>();
         for (int i = 0; i < entities.size(); i++) {
@@ -238,11 +294,21 @@ public class Analyzer {
 
         utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
                 numIterations,
-                "basic_read", entityType);
+                "basic_read", entities);
         System.out.println(ANSI_GREEN + "Read operation(s) complete\n" + ANSI_RESET);
     }
 
-    // Method to analyze specific operations for all the databases
+    /**
+     * Method to test the databases against specific queries.
+     * It selects a random entity from the list of entities at each iteration and
+     * performs a complicated specific query in the database. This selected query
+     * involves joins, aggregations, etc., and is same for all the databases.
+     * This operation is performed for numIterations times and the time and memory
+     * consumed for each iteration is recorded for all the databases.
+     * 
+     * @param numIterations number of iterations to run
+     * @throws Exception exception if something went wrong
+     */
     public void query(int numIterations) throws Exception {
         PostgresAnalyzer postgresAnalyzer = new PostgresAnalyzer();
         MongoDBAnalyzer mongoDBAnalyzer = new MongoDBAnalyzer();
@@ -285,10 +351,20 @@ public class Analyzer {
         LineChart.plot(idx, memory, labels, "Number Of Insertions", "Memory (bytes)",
                 "Memory Consumption", outputDir + "specific_query_memory.png");
 
-        List<String> entityType = new ArrayList<String>();
+        List<Object> entities = new ArrayList<Object>();
         utils.writeResults(postgresTimes, mongoTimes, neoTimes, postgresMemory, mongoMemory, neoMemory,
                 numIterations,
-                "specific_query", entityType);
+                "specific_query", entities);
         System.out.println(ANSI_GREEN + "Specific query operation(s) complete\n" + ANSI_RESET);
+    }
+
+    /**
+     * Method to add the relationships between the entities in the databases.
+     * 
+     * @throws Exception exception if something went wrong
+     */
+    public void addRelationships() throws Exception {
+        Neo4jAnalyzer neo4jAnalyzer = new Neo4jAnalyzer();
+        neo4jAnalyzer.createRelationships(utils.getRelationships());
     }
 }

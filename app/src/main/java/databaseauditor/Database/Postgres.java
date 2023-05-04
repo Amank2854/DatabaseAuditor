@@ -15,7 +15,14 @@ public class Postgres implements Database {
     Utilities util = new Utilities();
 
     @Override
-    // Method to connect to the postgres database
+    /**
+     * Method to connect to the database
+     * 
+     * @param url      url of the database
+     * @param username username for the database
+     * @param password password for the database
+     * @throws Exception exception if something went wrong
+     */
     public void connect(String url, String username, String password) throws Exception {
         if (this.conn != null) {
             return;
@@ -25,13 +32,24 @@ public class Postgres implements Database {
     }
 
     @Override
-    // Method to disconnect from the postgres database
+    /**
+     * Method to disconnect from the database
+     * 
+     * @throws Exception exception if something went wrong
+     */
     public void disconnect() throws Exception {
         this.conn.close();
     }
 
     @Override
-    // Method to insert one record into the postgres database
+    /**
+     * Method to insert one record into the Postgres database
+     * 
+     * @param <T> type of the object to be inserted into the database (model)
+     * @param obj object to be inserted into the database
+     * @return number of rows affected, 0 if unsuccessful
+     * @throws Exception exception if something went wrong
+     */
     public <T> int insertOne(T obj) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         String columns = "(", values = "(";
@@ -54,7 +72,15 @@ public class Postgres implements Database {
     }
 
     @Override
-    // Method to update many records in the postgres database
+    /**
+     * Method to update records in the Postgres database
+     * 
+     * @param <T>    type of the object to be updated in the database (model)
+     * @param obj    object to be updated in the database
+     * @param params list of parameters to check for in the database
+     * @return number of rows affected, 0 if unsuccessful
+     * @throws Exception exception if something went wrong
+     */
     public <T> int updateMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
@@ -87,7 +113,15 @@ public class Postgres implements Database {
     }
 
     @Override
-    // Method to delete many records from the postgres database
+    /**
+     * Method to delete records from the Postgres database
+     * 
+     * @param <T>    type of the object to be deleted from the database (model)
+     * @param obj    object to be deleted from the database
+     * @param params list of parameters to check for in the database
+     * @return number of rows affected, 0 if unsuccessful
+     * @throws Exception exception if something went wrong
+     */
     public <T> int deleteMany(T obj, List<List<String>> params) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();
@@ -117,7 +151,16 @@ public class Postgres implements Database {
     }
 
     @Override
-    // Method to select many records from the postgres database
+        /**
+     * Method to select records from the Postgres database
+     * 
+     * @param <T>     type of the object to be selected from the database (model)
+     * @param obj     an object of the model from which results will be selected from the database
+     * @param params  list of parameters to check for in the database
+     * @param reqCols list of attributes to be selected from the database
+     * @return number of rows affected, 0 if unsuccessful
+     * @throws Exception exception if something went wrong
+     */
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols) throws Exception {
         Field[] fields = obj.getClass().getDeclaredFields();
         List<String> fieldNames = new ArrayList<String>();

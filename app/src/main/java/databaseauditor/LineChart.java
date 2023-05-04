@@ -24,7 +24,18 @@ public class LineChart extends JFrame {
     static final String ANSI_RED = "\u001B[31m";
     static final String ANSI_RESET = "\u001B[0m";
 
-    // Class constructor to create a line chart
+    /**
+     * Constructor to create a line chart
+     * 
+     * @param x       x-axis values
+     * @param y       y-axis values
+     * @param label   label for each line
+     * @param x_label x-axis label
+     * @param y_label y-axis label
+     * @param title   title of the chart
+     * @param path    path to save the chart
+     * @throws Exception exception if something went wrong
+     */
     public LineChart(long[] x, List<long[]> y, List<String> label, String x_label, String y_label, String title,
             String path) throws Exception {
         XYDataset dataset = createDataset(x, y, label);
@@ -61,7 +72,14 @@ public class LineChart extends JFrame {
         ChartUtils.saveChartAsPNG(new File(path), chart, 1000, 600);
     }
 
-    // Method to create a dataset
+    /**
+     * Method to create a dataset
+     * 
+     * @param x     x-axis values
+     * @param y     y-axis values
+     * @param label label for each line
+     * @return XYDataset
+     */
     private XYDataset createDataset(long[] x, List<long[]> y, List<String> label) {
         var dataset = new XYSeriesCollection();
         for (int i = 0; i < label.size(); i++) {
@@ -76,13 +94,24 @@ public class LineChart extends JFrame {
         return dataset;
     }
 
-    // Method to create a line chart
+    /**
+     * Method to plot a line chart
+     * 
+     * @param x       x-axis values
+     * @param y       y-axis values
+     * @param label   label for each line
+     * @param x_label x-axis label
+     * @param y_label y-axis label
+     * @param title   title of the chart
+     * @param path    path to save the chart
+     */
     public static void plot(long[] x, List<long[]> y, List<String> label, String x_label, String y_label,
             String title, String path) {
         EventQueue.invokeLater(() -> {
             try {
                 new LineChart(x, y, label, x_label, y_label, title, path);
             } catch (Exception e) {
+                System.err.println(e.getMessage());
                 System.out.println(ANSI_RED + "\nSomething went wrong:" + e.getMessage() + "\n" + ANSI_RESET);
             }
         });

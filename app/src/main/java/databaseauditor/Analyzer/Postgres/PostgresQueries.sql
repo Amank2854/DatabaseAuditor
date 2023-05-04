@@ -199,3 +199,47 @@ GROUP BY
     c.customer_id, ci.city_id
 ORDER BY
     num_rentals DESC;
+
+--Set the replacement_cost to 0 for all DVDs that have been rented more than 20 times
+
+UPDATE film SET replacement_cost = 0 WHERE film_id IN (
+    SELECT inventory.film_id
+    FROM inventory
+        JOIN rental ON inventory.inventory_id = rental.inventory_id
+    GROUP BY inventory.film_id
+    HAVING COUNT(*) > 20
+);
+
+-- Increase rental rate of all Films released in 2006 by 50%
+
+UPDATE film
+SET rental_rate = rental_rate::Double Precision * 1.5
+WHERE release_year = '2006';
+
+
+-- Increase the rental rate of films in the 'Action' category by 10%, but only for films that have been rented at least 10 times.
+
+UPDATE film
+SET rental_rate = rental_rate::Double Precision * 1.1
+WHERE film_id IN (
+    SELECT f.film_id
+    FROM film f
+             JOIN film_category fc ON f.film_id = fc.film_id
+             JOIN inventory i ON f.film_id = i.film_id
+             JOIN rental r ON i.inventory_id = r.inventory_id
+    WHERE fc.category_id = (
+        SELECT category_id FROM category WHERE name = 'Action'
+    )
+    GROUP BY f.film_id
+    HAVING COUNT(*) >= 10
+);
+
+-- Delete all films that have not been rented out even once
+
+DELETE FROM film
+WHERE film_id NOT IN (
+    SELECT inventory.film_id
+    FROM inventory
+        JOIN rental ON inventory.inventory_id = rental.inventory_id
+    GROUP BY inventory.film_id
+);

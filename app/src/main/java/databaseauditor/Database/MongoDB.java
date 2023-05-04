@@ -1,6 +1,5 @@
 package databaseauditor.Database;
 
-
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -27,7 +26,15 @@ public class MongoDB implements Database {
     Utilities util = new Utilities();
 
     @Override
-    // Method to connect to the mongodb database
+    /**
+     * Method to connect to the mongodb database
+     * 
+     * @param url      url of the database
+     * @param username username of the database
+     * @param password password of the database
+     * @throws Exception exception if something went wrong
+     * @return void
+     */
     public void connect(String url, String username, String password) throws Exception {
         if (this.database != null) {
             return;
@@ -39,13 +46,24 @@ public class MongoDB implements Database {
     }
 
     @Override
-    // Method to disconnect from the mongodb database
+    /**
+     * Method to disconnect from the mongodb database
+     * 
+     * @throws Exception exception if something went wrong
+     */
     public void disconnect() {
         this.database = null;
     }
 
     @Override
-    // Method to insert one record into the mongodb database
+    /**
+     * Method to insert one record into the MongoDB database
+     * 
+     * @param <T> type of the object to be inserted into the database (model)
+     * @param obj object to be inserted into the database
+     * @return number of rows affected, 0 if unsuccessful
+     * @throws Exception exception if something went wrong
+     */
     public <T> int insertOne(T obj) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(
@@ -61,7 +79,15 @@ public class MongoDB implements Database {
     }
 
     @Override
-    // Method to update many records in the mongodb database
+    /**
+     * Method to update records in the MongoDB database
+     * 
+     * @param <T>    type of the object to be updated in the database (model)
+     * @param obj    object to be updated in the database
+     * @param params list of parameters to check for in the database
+     * @return number of rows affected, 0 if unsuccessful
+     * @throws Exception exception if something went wrong
+     */
     public <T> int updateMany(T obj, List<List<String>> params) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
@@ -94,7 +120,15 @@ public class MongoDB implements Database {
     }
 
     @Override
-    // Method to delete many records from the mongodb database
+    /**
+     * Method to delete records from the MongoDB database
+     * 
+     * @param <T>    type of the object to be deleted from the database (model)
+     * @param obj    object to be deleted from the database
+     * @param params list of parameters to check for in the database
+     * @return number of rows affected, 0 if unsuccessful
+     * @throws Exception exception if something went wrong
+     */
     public <T> int deleteMany(T obj, List<List<String>> params) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length
@@ -124,7 +158,16 @@ public class MongoDB implements Database {
     }
 
     @Override
-    // Method to select many records from the mongodb database
+    /**
+     * Method to select records from the MongoDB database
+     * 
+     * @param <T>     type of the object to be selected from the database (model)
+     * @param obj     an object of the model from which results will be selected from the database
+     * @param params  list of parameters to check for in the database
+     * @param reqCols list of attributes to be selected from the database
+     * @return number of rows affected, 0 if unsuccessful
+     * @throws Exception exception if something went wrong
+     */
     public <T> int select(T obj, List<List<String>> params, List<String> reqCols) throws Exception {
         MongoCollection<Document> collection = this.database.getCollection(
                 util.camelToSnakeCase(obj.getClass().getName().split("\\.")[obj.getClass().getName().split("\\.").length

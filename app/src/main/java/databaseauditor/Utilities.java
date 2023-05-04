@@ -11,12 +11,27 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Utilities {
-    // Method to convert camel case to snake case
+    /**
+     * Method to convert a camel case string to camel snake case
+     * 
+     * @param camelCase the camel case string
+     * @return the camel snake case string
+     */
     public String camelToSnakeCase(String camelCase) {
         return camelCase.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }
 
-    // Method to calculate the execution time of a method
+    /**
+     * Method to calculate the execution time of a method
+     * 
+     * @param <T>        the type of the object
+     * @param obj        the object to invoke the method on
+     * @param methodName the name of the method to invoke
+     * @param params     the parameters to pass to the method
+     * @param log        whether to log the result or not
+     * @return the memory consumed by the method
+     * @throws Exception if the method could not be invoked
+     */
     public <T> long getElapsedTime(T obj, String methodName, Object[] params, boolean log) throws Exception {
         Class<?> clazz = obj.getClass();
         Method methlist[] = clazz.getDeclaredMethods();
@@ -48,7 +63,17 @@ public class Utilities {
         throw new Exception("ERROR: Execution time could not be calculated");
     }
 
-    // Method to calculate the consumed memory by a method
+    /**
+     * Method to calculate the memory consumed by a method
+     * 
+     * @param <T>        the type of the object
+     * @param obj        the object to invoke the method on
+     * @param methodName the name of the method to invoke
+     * @param params     the parameters to pass to the method
+     * @param log        whether to log the result or not
+     * @return the memory consumed by the method
+     * @throws Exception if the method could not be invoked
+     */
     public <T> long getConsumedMemory(T obj, String methodName, Object[] params, boolean log) throws Exception {
         Class<?> clazz = obj.getClass();
         Method methlist[] = clazz.getDeclaredMethods();
@@ -79,7 +104,13 @@ public class Utilities {
         throw new Exception("ERROR: Consumed memory could not be calculated");
     }
 
-    // Method to instantiate a class
+    /**
+     * Method to instantiate a class
+     * 
+     * @param className the name of the class to instantiate
+     * @return the instantiated object
+     * @throws Exception if the class could not be instantiated
+     */
     public Object instantiate(String className) throws Exception {
         Class<?> clazz = Class.forName(className);
         Constructor<?> ctor = clazz.getConstructors()[0];
@@ -93,7 +124,12 @@ public class Utilities {
         return ctor.newInstance(args);
     }
 
-    // Method to get all instances of the model classes
+    /**
+     * Method to get a list of objects of all the models from the Models.txt file
+     * 
+     * @return a list of objects for all the models
+     * @throws Exception if the models could not be instantiated
+     */
     public List<Object> getModels() throws Exception {
         List<String> classes = new ArrayList<String>();
         File file = new File(
@@ -116,7 +152,13 @@ public class Utilities {
         return data;
     }
 
-    // Method to get all relationships between the model classes
+    /**
+     * Method to get the description of the model relationships from the
+     * Relationships.txt file
+     * 
+     * @return
+     * @throws Exception
+     */
     public List<List<String>> getRelationships() throws Exception {
         List<List<String>> relationships = new ArrayList<List<String>>();
         File file = new File(
@@ -129,7 +171,7 @@ public class Utilities {
             String[] line = cur.substring(0, cur.length() - 1).split(",");
             List<String> relationship = new ArrayList<String>();
             for (String word : line) {
-                relationship.add(word.trim().substring(1, word.trim().length() - 1));
+                relationship.add(camelToSnakeCase(word.trim().substring(1, word.trim().length() - 1)));
             }
 
             relationships.add(relationship);
@@ -139,7 +181,13 @@ public class Utilities {
         return relationships;
     }
 
-    // Method calculate the mean of an array
+    /**
+     * Method to calculate the mean of an array
+     * 
+     * @param arr the array to calculate the mean of
+     * @param len the length of the array
+     * @return the mean of the array
+     */
     public double mean(long arr[], int len) {
         long sum = 0;
         for (int i = 0; i < len; i++) {
@@ -149,7 +197,13 @@ public class Utilities {
         return (double) sum / (double) len;
     }
 
-    // Method to calculate the median of an array
+    /**
+     * Method to calculate the median of an array
+     * 
+     * @param arr the array to calculate the median of
+     * @param len the length of the array
+     * @return the median of the array
+     */
     public double median(long arr[], int len) {
         if (len % 2 == 0) {
             return (double) (arr[len / 2] + arr[len / 2 - 1]) / 2.0;
@@ -158,7 +212,13 @@ public class Utilities {
         }
     }
 
-    // Method calculate the standard deviation of an array
+    /**
+     * Method to calculate the standard deviation of an array
+     * 
+     * @param arr the array to calculate the standard deviation of
+     * @param len the length of the array
+     * @return the standard deviation of the array
+     */
     public double standardDeviation(long arr[], int len) {
         double mean = mean(arr, len), sum = 0;
         for (int i = 0; i < len; i++) {
@@ -168,8 +228,22 @@ public class Utilities {
         return Math.sqrt(sum / (double) len);
     }
 
+    /**
+     * Method to write the results of the tests to a txt file
+     * 
+     * @param postgresTimes  the times for the Postgres tests
+     * @param mongoTimes     the times for the MongoDB tests
+     * @param neoTimes       the times for the Neo4j tests
+     * @param postgresMemory the memory for the Postgres tests
+     * @param mongoMemory    the memory for the MongoDB tests
+     * @param neoMemory      the memory for the Neo4j tests
+     * @param numIterations  the number of iterations for the tests
+     * @param type           the type of test
+     * @param entities       the entities that were tested
+     * @throws Exception if the txt file could not be written
+     */
     public void writeResults(long[] postgresTimes, long[] mongoTimes, long[] neoTimes, long[] postgresMemory,
-            long[] mongoMemory, long[] neoMemory, int numIterations, String type, List<String> entities)
+            long[] mongoMemory, long[] neoMemory, int numIterations, String type, List<Object> entities)
             throws Exception {
         List<Double> timeMeans = Arrays.asList(this.mean(postgresTimes, numIterations),
                 this.mean(mongoTimes, numIterations),
@@ -193,7 +267,7 @@ public class Utilities {
 
         FileWriter writerObj = new FileWriter(System.getProperty("user.dir")
                 + "/src/results/results.txt", true);
-        
+
         writerObj.write(numIterations + " \"" + type + "\"");
         if (entities.size() >= 1) {
             writerObj.write(" for: " + entities + "\n");

@@ -1,5 +1,6 @@
 plugins {
     application
+    jacoco
 }
 
 repositories {
@@ -24,4 +25,22 @@ application {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+    testLogging.showStandardStreams = true
+
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(false)
+        csv.required.set(false)
+        html.outputLocation.set(layout.buildDirectory.dir("./docs/jacoco report"))
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDirectory.set(layout.buildDirectory.dir("./docs/jacoco report"))
 }
