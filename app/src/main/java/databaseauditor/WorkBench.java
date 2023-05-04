@@ -11,24 +11,26 @@ public class WorkBench {
     Utilities utils = new Utilities();
 
     void init() {
-        Builder builder = new Builder();
         try {
             List<Object> objs = utils.getModels();
+            Builder builder = new Builder();
+            builder.init(objs);
 
-            List<Object> ob1 = new ArrayList<>();
-            Random rand = new Random();
-            ob1.add(objs.get(rand.nextInt(objs.size())));
-            // System.out.println(ob1);
+            // List<Object> selectedObj = new ArrayList<>();
+            // Random rand = new Random();
+            // selectedObj.add(objs.get(rand.nextInt(objs.size())));
+            // System.out.println(selectedObj);
 
             Analyzer analyzer = new Analyzer();
-            analyzer.create(ob1, 10000);
+            analyzer.create(objs, 100);
             
-            // analyzer.create(ob1, 10000);
-            analyzer.read(ob1, 1000);
-            analyzer.update(ob1, 1000);
-            analyzer.delete(ob1, 1000);
+            analyzer.create(objs, 100);
+            // analyzer.read(objs, 100);
+            // analyzer.update(objs, 100);
+            // analyzer.delete(objs, 100);
             
-            // analyzer.query(200);
+            analyzer.addRelationships();
+            analyzer.query(200);
 
             analyzer.close();
         } catch (Exception e) {

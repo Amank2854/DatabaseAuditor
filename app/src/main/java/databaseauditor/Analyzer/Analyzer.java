@@ -47,8 +47,6 @@ public class Analyzer {
         this.postgres.disconnect();
         this.mongo.disconnect();
         this.neo.disconnect();
-
-        System.out.println("Analyzer closed successfully");
     }
 
     /**
@@ -337,9 +335,9 @@ public class Analyzer {
             postgresMemory[i] = utils.getConsumedMemory(postgresAnalyzer, "query", params, false);
             mongoTimes[i] = utils.getElapsedTime(mongoDBAnalyzer, "query", params, false);
             mongoMemory[i] = utils.getConsumedMemory(mongoDBAnalyzer, "query", params, false);
-            // neoTimes[i] = utils.getElapsedTime(neo4jAnalyzer, "query", params, false);
-            // neoMemory[i] = utils.getConsumedMemory(neo4jAnalyzer, "query", params,
-            // false);
+            neoTimes[i] = utils.getElapsedTime(neo4jAnalyzer, "query", params, false);
+            neoMemory[i] = utils.getConsumedMemory(neo4jAnalyzer, "query", params,
+                    false);
         }
 
         List<String> labels = Arrays.asList("PostgreSQL", "MongoDB", "Neo4j");
