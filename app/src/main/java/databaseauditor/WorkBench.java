@@ -1,32 +1,41 @@
 package databaseauditor;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import databaseauditor.Analyzer.Analyzer;
+import databaseauditor.Database.Builder;
 
 public class WorkBench {
+    Utilities utils = new Utilities();
+
     void init() {
-        PostgreSQL postgres = new PostgreSQL();
-        postgres.connect();
+        try {
+            List<Object> objs = utils.getModels();
+            Builder builder = new Builder();
+            builder.init(objs);
 
-        Address obj = new Address(1, "123 Main St", "Apt 1", "District 1", 1, "12345", "123-456-7890",
-                Timestamp.valueOf(LocalDateTime.now()));
-        if (postgres.insertOne(obj) != -1) {
-            System.out.println("INSERT SUCCESSFULL");
-        }
+            // List<Object> selectedObj = new ArrayList<>();
+            // Random rand = new Random();
+            // selectedObj.add(objs.get(rand.nextInt(objs.size())));
+            // System.out.println(selectedObj);
 
-        obj.city_id = 2;
-        List<List<String>> params = Arrays.asList(Arrays.asList("address_id", "1"));
-        int rows = postgres.updateMany(obj, params);
-        if (rows != -1) {
-            System.out.println("UPDATE SUCCESSFULL " + rows);
-        }
+            Analyzer analyzer = new Analyzer();
+            analyzer.create(objs, 100);
+            
+            analyzer.create(objs, 100);
+            // analyzer.read(objs, 100);
+            // analyzer.update(objs, 100);
+            // analyzer.delete(objs, 100);
+            
+            analyzer.addRelationships();
+            analyzer.query(200);
 
-        params = Arrays.asList(Arrays.asList("address_id", "1"), Arrays.asList("city_id", "2"));
-        rows = postgres.deleteMany(obj, params);
-        if (rows != -1) {
-            System.out.println("DELETE SUCCESSFULL " + rows);
+            analyzer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 }
